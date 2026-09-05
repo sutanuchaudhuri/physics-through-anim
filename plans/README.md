@@ -23,6 +23,7 @@ status; these documents are the source of truth for design.
 | --- | --- |
 | [ROADMAP.md](ROADMAP.md) | Studio production rules, course map, lesson template, and milestones |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Scalable, cross-domain namespace & layering of the physics framework |
+| [DIAGRAMS.md](DIAGRAMS.md) | Entity/class, flow, and sequence diagrams (Mermaid + PlantUML) |
 | [physics_asset_library.md](physics_asset_library.md) | Signed-off overview of the composable asset library |
 | [asset_library/](asset_library/) | Per-milestone plans M1–M18 (see [asset_library/README.md](asset_library/README.md)) |
 | [fluids/](fluids/) | Fluids domain plans F1–F6 (see [fluids/README.md](fluids/README.md)) |
