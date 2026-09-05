@@ -1,0 +1,454 @@
+[lessons.rolling_slipping]
+dir = "rolling_slipping"
+audio_subdir = "rolling_slipping"
+final_output = "rolling_slipping_full.mp4"
+
+[lessons.rolling_slipping.scenes."00"]
+file = "s00_opening_hook.py"
+class_name = "OpeningHook"
+narration = "s00_opening_hook"
+chapter = "0"
+
+[lessons.rolling_slipping.scenes."01"]
+file = "s01_block_static.py"
+class_name = "BlockStatic"
+narration = "s01_block_static"
+chapter = "I"
+
+[lessons.rolling_slipping.scenes."02"]
+file = "s02_why_not_backward.py"
+class_name = "WhyNotBackward"
+narration = "s02_why_not_backward"
+chapter = "I"
+
+[lessons.rolling_slipping.scenes."03"]
+file = "s03_limiting_friction.py"
+class_name = "LimitingFriction"
+narration = "s03_limiting_friction"
+chapter = "I"
+
+[lessons.rolling_slipping.scenes."04"]
+file = "s04_sliding_begins.py"
+class_name = "SlidingBegins"
+narration = "s04_sliding_begins"
+chapter = "I"
+
+[lessons.rolling_slipping.scenes."05"]
+file = "s05_slipping_definition.py"
+class_name = "SlippingDefinition"
+narration = "s05_slipping_definition"
+chapter = "I"
+
+[lessons.rolling_slipping.scenes."06"]
+file = "s06_two_frames.py"
+class_name = "TwoFrames"
+narration = "s06_two_frames"
+chapter = "I"
+
+[lessons.rolling_slipping.scenes."07"]
+file = "s07_disk_at_rest.py"
+class_name = "DiskAtRest"
+narration = "s07_disk_at_rest"
+chapter = "II"
+
+[lessons.rolling_slipping.scenes."08"]
+file = "s08_disk_rolling_constant.py"
+class_name = "DiskRollingConstant"
+narration = "s08_disk_rolling_constant"
+chapter = "II"
+
+[lessons.rolling_slipping.scenes."09"]
+file = "s09_center_pull.py"
+class_name = "CenterPull"
+narration = "s09_center_pull"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."10"]
+file = "s10_center_pull_equations.py"
+class_name = "CenterPullEquations"
+narration = "s10_center_pull_equations"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."11"]
+file = "s11_increase_force.py"
+class_name = "IncreaseForce"
+narration = "s11_increase_force"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."12"]
+file = "s12_center_pull_slips.py"
+class_name = "CenterPullSlips"
+narration = "s12_center_pull_slips"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."13"]
+file = "s13_top_pull_forward.py"
+class_name = "TopPullForward"
+narration = "s13_top_pull_forward"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."14"]
+file = "s14_solve_forward_case.py"
+class_name = "SolveForwardCase"
+narration = "s14_solve_forward_case"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."15"]
+file = "s15_general_rule.py"
+class_name = "GeneralRule"
+narration = "s15_general_rule"
+chapter = "III"
+
+[lessons.rolling_slipping.scenes."16"]
+file = "s16_rigid_body_torque.py"
+class_name = "RigidBodyTorque"
+narration = "s16_rigid_body_torque"
+chapter = "IV"
+
+[lessons.rolling_slipping.scenes."17"]
+file = "s17_moment_of_inertia_meaning.py"
+class_name = "MomentOfInertiaMeaning"
+narration = "s17_moment_of_inertia_meaning"
+chapter = "IV"
+
+[lessons.rolling_slipping.scenes."18"]
+file = "s18_rotational_energy.py"
+class_name = "RotationalEnergy"
+narration = "s18_rotational_energy"
+chapter = "IV"
+
+[lessons.rolling_slipping.scenes."19"]
+file = "s19_velocity_of_point.py"
+class_name = "VelocityOfPoint"
+narration = "s19_velocity_of_point"
+chapter = "V"
+
+[lessons.rolling_slipping.scenes."20"]
+file = "s20_bottom_center_top.py"
+class_name = "BottomCenterTop"
+narration = "s20_bottom_center_top"
+chapter = "V"
+
+[lessons.rolling_slipping.scenes."21"]
+file = "s21_pure_rolling_cancellation.py"
+class_name = "PureRollingCancellation"
+narration = "s21_pure_rolling_cancellation"
+chapter = "V"
+
+[lessons.rolling_slipping.scenes."22"]
+file = "s22_instantaneous_center.py"
+class_name = "InstantaneousCenter"
+narration = "s22_instantaneous_center"
+chapter = "V"
+
+[lessons.rolling_slipping.scenes."23"]
+file = "s23_separate_analyses.py"
+class_name = "SeparateAnalyses"
+narration = "s23_separate_analyses"
+chapter = "VI"
+
+[lessons.rolling_slipping.scenes."24"]
+file = "s24_rolling_constraint_couples.py"
+class_name = "RollingConstraintCouples"
+narration = "s24_rolling_constraint_couples"
+chapter = "VI"
+
+[lessons.rolling_slipping.scenes."25"]
+file = "s25_complete_solver.py"
+class_name = "CompleteSolver"
+narration = "s25_complete_solver"
+chapter = "VI"
+
+[lessons.rolling_slipping.scenes."26"]
+file = "s26_four_situations.py"
+class_name = "FourSituations"
+narration = "s26_four_situations"
+chapter = "VI"
+
+[lessons.rolling_slipping.scenes."27"]
+file = "s27_final_challenge.py"
+class_name = "FinalChallenge"
+narration = "s27_final_challenge"
+chapter = "VI"
+
+[lessons.rolling_slipping.scenes."28"]
+file = "s28_pymunk_spin_to_roll.py"
+class_name = "PymunkSpinToRoll"
+narration = "s28_pymunk_spin_to_roll"
+chapter = "Bonus"
+
+[lessons.rod_slipping]
+dir = "rod_slipping"
+audio_subdir = "rod_slipping"
+final_output = "rod_slipping_full.mp4"
+
+[lessons.rod_slipping.scenes."00"]
+file = "s00_intro.py"
+class_name = "Scene00Intro"
+narration = "s00_intro"
+chapter = "0"
+
+[lessons.rod_slipping.scenes."01"]
+file = "s01_almost_vertical.py"
+class_name = "Scene01AlmostVertical"
+narration = "s01_almost_vertical"
+chapter = "I"
+
+[lessons.rod_slipping.scenes."02"]
+file = "s02_why_rotation.py"
+class_name = "Scene02WhyRotation"
+narration = "s02_why_rotation"
+chapter = "I"
+
+[lessons.rod_slipping.scenes."03"]
+file = "s03_first_fbd.py"
+class_name = "Scene03FirstFBD"
+narration = "s03_first_fbd"
+chapter = "I"
+
+[lessons.rod_slipping.scenes."04"]
+file = "s04_why_contact_point.py"
+class_name = "Scene04WhyContactPoint"
+narration = "s04_why_contact_point"
+chapter = "I"
+
+[lessons.rod_slipping.scenes."05"]
+file = "s05_expiration_date.py"
+class_name = "Scene05ExpirationDate"
+narration = "s05_expiration_date"
+chapter = "I"
+
+[lessons.rod_slipping.scenes."06"]
+file = "s06_energy_method.py"
+class_name = "Scene06EnergyMethod"
+narration = "s06_energy_method"
+chapter = "II"
+
+[lessons.rod_slipping.scenes."07"]
+file = "s07_energy_visualized.py"
+class_name = "Scene07EnergyVisualized"
+narration = "s07_energy_visualized"
+chapter = "II"
+
+[lessons.rod_slipping.scenes."08"]
+file = "s08_kinematics_time.py"
+class_name = "Scene08KinematicsTime"
+narration = "s08_kinematics_time"
+chapter = "II"
+
+[lessons.rod_slipping.scenes."09"]
+file = "s09_omega_graph.py"
+class_name = "Scene09OmegaGraph"
+narration = "s09_omega_graph"
+chapter = "II"
+
+[lessons.rod_slipping.scenes."10"]
+file = "s10_alpha_graph.py"
+class_name = "Scene10AlphaGraph"
+narration = "s10_alpha_graph"
+chapter = "II"
+
+[lessons.rod_slipping.scenes."11"]
+file = "s11_slip_condition_intro.py"
+class_name = "Scene11SlipConditionIntro"
+narration = "s11_slip_condition_intro"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."12"]
+file = "s12_cm_acceleration.py"
+class_name = "Scene12CMAcceleration"
+narration = "s12_cm_acceleration"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."13"]
+file = "s13_required_friction.py"
+class_name = "Scene13RequiredFriction"
+narration = "s13_required_friction"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."14"]
+file = "s14_normal_force.py"
+class_name = "Scene14NormalForce"
+narration = "s14_normal_force"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."15"]
+file = "s15_friction_demand_graph.py"
+class_name = "Scene15FrictionDemandGraph"
+narration = "s15_friction_demand_graph"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."16"]
+file = "s16_slip_angle_equation.py"
+class_name = "Scene16SlipAngleEquation"
+narration = "s16_slip_angle_equation"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."17"]
+file = "s17_friction_reversal.py"
+class_name = "Scene17FrictionReversal"
+narration = "s17_friction_reversal"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."18"]
+file = "s18_slip_example.py"
+class_name = "Scene18SlipExample"
+narration = "s18_slip_example"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."19"]
+file = "s19_slip_begins.py"
+class_name = "Scene19SlipBegins"
+narration = "s19_slip_begins"
+chapter = "III"
+
+[lessons.rod_slipping.scenes."20"]
+file = "s20_friction_kinetic.py"
+class_name = "Scene20FrictionBecomesKinetic"
+narration = "s20_friction_kinetic"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."21"]
+file = "s21_energy_after_slip.py"
+class_name = "Scene21EnergyAfterSlip"
+narration = "s21_energy_after_slip"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."22"]
+file = "s22_post_slip_equations.py"
+class_name = "Scene22PostSlipEquations"
+narration = "s22_post_slip_equations"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."23"]
+file = "s23_sliding_toward_edge.py"
+class_name = "Scene23SlidingTowardEdge"
+narration = "s23_sliding_toward_edge"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."24"]
+file = "s24_the_edge.py"
+class_name = "Scene24TheEdge"
+narration = "s24_the_edge"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."25"]
+file = "s25_graphs_during_edge_contact.py"
+class_name = "Scene25GraphsDuringEdgeContact"
+narration = "s25_graphs_during_edge_contact"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."26"]
+file = "s26_separation_condition.py"
+class_name = "Scene26SeparationCondition"
+narration = "s26_separation_condition"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."27"]
+file = "s27_separation_in_this_example.py"
+class_name = "Scene27SeparationInThisExample"
+narration = "s27_separation_in_this_example"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."28"]
+file = "s28_exact_separation_state.py"
+class_name = "Scene28ExactSeparationState"
+narration = "s28_exact_separation_state"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."29"]
+file = "s29_combined_graph.py"
+class_name = "Scene29CombinedGraph"
+narration = "s29_combined_graph"
+chapter = "IV"
+
+[lessons.rod_slipping.scenes."30"]
+file = "s30_free_flight_translation.py"
+class_name = "Scene30FreeFlightTranslation"
+narration = "s30_free_flight_translation"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."31"]
+file = "s31_free_flight_rotation.py"
+class_name = "Scene31FreeFlightRotation"
+narration = "s31_free_flight_rotation"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."32"]
+file = "s32_energy_in_flight.py"
+class_name = "Scene32EnergyInFlight"
+narration = "s32_energy_in_flight"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."33"]
+file = "s33_how_long_in_air.py"
+class_name = "Scene33HowLongInAir"
+narration = "s33_how_long_in_air"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."34"]
+file = "s34_endpoint_coordinates.py"
+class_name = "Scene34EndpointCoordinates"
+narration = "s34_endpoint_coordinates"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."35"]
+file = "s35_impact_condition.py"
+class_name = "Scene35ImpactCondition"
+narration = "s35_impact_condition"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."36"]
+file = "s36_how_many_spins.py"
+class_name = "Scene36HowManySpins"
+narration = "s36_how_many_spins"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."37"]
+file = "s37_the_180_subtlety.py"
+class_name = "Scene37The180Subtlety"
+narration = "s37_the_180_subtlety"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."38"]
+file = "s38_orientation_at_impact.py"
+class_name = "Scene38OrientationAtImpact"
+narration = "s38_orientation_at_impact"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."39"]
+file = "s39_which_end_hits_first.py"
+class_name = "Scene39WhichEndHitsFirst"
+narration = "s39_which_end_hits_first"
+chapter = "V"
+
+[lessons.rod_slipping.scenes."40"]
+file = "s40_full_telemetry_replay.py"
+class_name = "Scene40FullTelemetryReplay"
+narration = "s40_full_telemetry_replay"
+chapter = "VI"
+
+[lessons.rod_slipping.scenes."41"]
+file = "s41_four_tool_comparison.py"
+class_name = "Scene41FourToolComparison"
+narration = "s41_four_tool_comparison"
+chapter = "VI"
+
+[lessons.rod_slipping.scenes."42"]
+file = "s42_why_not_energy_only.py"
+class_name = "Scene42WhyNotEnergyOnly"
+narration = "s42_why_not_energy_only"
+chapter = "VI"
+
+[lessons.rod_slipping.scenes."43"]
+file = "s43_why_not_torque_only.py"
+class_name = "Scene43WhyNotTorqueOnly"
+narration = "s43_why_not_torque_only"
+chapter = "VI"
+
+[lessons.rod_slipping.scenes."44"]
+file = "s44_final_conceptual_map.py"
+class_name = "Scene44FinalConceptualMap"
+narration = "s44_final_conceptual_map"
+chapter = "VI"
+

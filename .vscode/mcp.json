@@ -1,0 +1,58 @@
+// VS Code MCP servers for this workspace (JSONC — comments allowed).
+// Docs: https://code.visualstudio.com/docs/copilot/chat/mcp-servers
+// After editing: open this file and click "Start" on a server, or run
+// "MCP: List Servers" from the Command Palette. Then in Copilot *Agent* mode
+// open the Tools picker and enable the Atlassian tools.
+{
+  // Secrets are prompted at runtime and stored in VS Code secret storage —
+  // never hard-code an API token in this file.
+  "inputs": [
+    {
+      "id": "jira_url",
+      "type": "promptString",
+      "description": "Jira base URL (e.g. https://your-org.atlassian.net)"
+    },
+    {
+      "id": "jira_email",
+      "type": "promptString",
+      "description": "Atlassian account email"
+    },
+    {
+      "id": "jira_api_token",
+      "type": "promptString",
+      "description": "Atlassian API token (id.atlassian.com > Security > API tokens)",
+      "password": true
+    }
+  ],
+
+  "servers": {
+    // ── Option A (recommended): Atlassian's official Remote MCP Server ────────
+    // Cloud only. Auth is OAuth in the browser — no token stored here.
+    // Streamable HTTP endpoint. The old HTTP+SSE endpoint
+    // (https://mcp.atlassian.com/v1/sse) is deprecated after 30 June 2026:
+    // https://community.atlassian.com/forums/Atlassian-Remote-MCP-Server/HTTP-SSE-Deprecation-Notice/ba-p/3205484
+    "atlassian": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v1/mcp"
+    }
+
+    // ── Option B: self-hosted community server (Cloud or Server/DC) ───────────
+    // Uses an API token. Requires Docker. Uncomment to use instead of Option A.
+    // "atlassian-selfhosted": {
+    //   "type": "stdio",
+    //   "command": "docker",
+    //   "args": [
+    //     "run", "-i", "--rm",
+    //     "-e", "JIRA_URL",
+    //     "-e", "JIRA_USERNAME",
+    //     "-e", "JIRA_API_TOKEN",
+    //     "ghcr.io/sooperset/mcp-atlassian:latest"
+    //   ],
+    //   "env": {
+    //     "JIRA_URL": "${input:jira_url}",
+    //     "JIRA_USERNAME": "${input:jira_email}",
+    //     "JIRA_API_TOKEN": "${input:jira_api_token}"
+    //   }
+    // }
+  }
+}

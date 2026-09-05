@@ -1,0 +1,16 @@
+[publications.rolling-slipping-s13-top-pull-forward]
+source = "/Volumes/External/Developer/Physics/physics-through-anim/media/videos/rolling_slipping/s13_top_pull_forward/1080p60/TopPullForward.mp4"
+file = "/Volumes/External/Developer/Physics/physics-through-anim/media/videos/rolling_slipping/s13_top_pull_forward/1080p60/TopPullForward.mp4"
+platform = "youtube"
+title = "Rolling & Slipping: Pulling Forward From the Top"
+description = "A scene from the Rolling, Slipping and Friction lesson: pulling a wheel forward from the top and solving whether it rolls or slips."
+tags = ["physics", "manim", "rolling-without-slipping", "friction"]
+visibility = "private"
+category = "27"
+made_for_kids = false
+playlist = ""
+thumbnail = ""
+status = "pending"
+video_id = ""
+url = ""
+

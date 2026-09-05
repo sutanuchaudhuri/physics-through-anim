@@ -1,0 +1,38 @@
+# ---------------------------------------------------------------------------
+# physics-through-anim — only source code and documentation are version-controlled.
+# Rendered videos, audio, and generated artifacts must NOT be committed.
+# ---------------------------------------------------------------------------
+
+# Rendered output (Manim videos, images, partial-movie files, stitched finals)
+media/
+
+# Generated / draft narration audio (macOS `say` drafts + reviewed WAVs are large)
+assets/audio/
+
+# Any stray media binaries anywhere in the tree
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.wav
+*.mp3
+*.aac
+
+# Python bytecode / build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual environment and tool caches
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# OS / editor cruft
+.DS_Store
+*.swp

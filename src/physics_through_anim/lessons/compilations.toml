@@ -1,0 +1,5 @@
+[compilations.s02_why_not_backward]
+lesson = "rolling_slipping"
+scenes = ["02"]
+output = "s02_why_not_backward.mp4"
+
