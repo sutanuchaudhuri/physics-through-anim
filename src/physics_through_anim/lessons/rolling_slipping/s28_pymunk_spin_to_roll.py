@@ -10,7 +10,8 @@ import os
 from pathlib import Path
 
 from manim import BLUE, DOWN, GRAY, ORANGE, UP, Circle, Dot, Line, MathTex, Text, Write
-from manim_physics import SpaceScene
+
+from physics_through_anim.sim import SpaceScene
 
 
 class PymunkSpinToRoll(SpaceScene):

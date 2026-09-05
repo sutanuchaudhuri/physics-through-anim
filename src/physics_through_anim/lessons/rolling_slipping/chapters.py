@@ -19,5 +19,5 @@ CHAPTERS: dict[str, Chapter] = {
     "IV": Chapter("IV", "Why Rotation Responds to Torque"),
     "V": Chapter("V", "Translation Plus Rotation"),
     "VI": Chapter("VI", "Translation and Rotation as Two Coupled Problems"),
-    "Bonus": Chapter("Bonus", "Simulated with manim-physics"),
+    "Bonus": Chapter("Bonus", "Simulated with pymunk"),
 }

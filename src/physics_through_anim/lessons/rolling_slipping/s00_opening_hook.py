@@ -38,9 +38,9 @@ from manim import (
     VGroup,
     Write,
 )
-from manim_physics import SpaceScene
 
 from physics_through_anim.lessons.rolling_slipping.common import force_arrow
+from physics_through_anim.sim import SpaceScene
 
 
 class OpeningHook(SpaceScene):

@@ -174,16 +174,16 @@ narration/captions carry the qualitative meaning. Full-sentence captions
 (prompts, conclusions, misconception/correction cards) belong in the bottom
 band, spatially separate from the diagram, never overlapping a vector.
 
-## 10. `manim-physics` plugin — what it's for and how to use it here
+## 10. Rigid-body simulation (`physics_through_anim.sim`) — what it's for and how to use it
 
-`manim-physics==0.2.4` is an installed dependency (see `pyproject.toml`). **Pin
-it to `0.2.4`, never `>=0.4.0`**: manim-physics 0.4.0+ requires `manim<0.19`,
-which conflicts with this repo's pinned `manim==0.21.0`; 0.2.4 declares no
-upper bound on manim and is verified working (`from manim_physics import ...`
-imports and renders cleanly against 0.21.0 as of this writing).
+Emergent rigid-body / collision physics comes from a **vendored** pymunk engine
+at `src/physics_through_anim/sim/space.py`, not the old `manim-physics` plugin.
+(`manim-physics==0.2.4` was removed: it pinned `shapely<2` and an old Manim API,
+which capped Python at 3.11. `pymunk` alone runs on current Python + Manim, and
+the vendored `SpaceScene` preserves the 0.2.4 behaviour the lessons relied on.)
 
 ```python
-from manim_physics import Pendulum, MultiPendulum, SpaceScene
+from physics_through_anim.sim import SpaceScene
 ```
 
 What it gives us and when to reach for it instead of hand-computed kinematics:
@@ -198,40 +198,32 @@ What it gives us and when to reach for it instead of hand-computed kinematics:
   have `zoom_to`/`zoom_out`/`scene_header`/etc. for free; either don't mix them,
   or create a small `RollingSpaceScene(SpaceScene)` mixin that duplicates the
   handful of layout helpers it needs.
-- **`Pendulum(length, initial_theta, pivot_point)` / `MultiPendulum(...)`** —
-  physically simulated pendulum bobs (needs `SpaceScene` + `make_rigid_body`).
-  This is the natural fit for the planned SHM lesson (`shm` topic in
-  `registry.py`) instead of hand-animating a swinging bob.
-- **`manim_physics.wave` (`LinearWave`, `RadialWave`, `StandingWave`)** —
-  ready-made wave field animations; candidates for a future waves/SHM lesson
-  rather than something to build from scratch with `ParametricFunction`.
-- **`manim_physics.electromagnetism` (`Charge`, `ElectricField`,
-  `MagneticField`, `Wire`) and `manim_physics.optics` (`Lens`, `Ray`)** —
-  not needed by the current mechanics-only roadmap; note for if an EM/optics
-  lesson is ever added, don't hand-roll field-line plotting first.
+- **Only the rigid-body `SpaceScene` is vendored.** The old plugin's
+  `Pendulum`/`MultiPendulum`, `wave`, `electromagnetism`, and `optics` modules
+  are **no longer bundled** (nothing in this repo used them). When SHM, waves,
+  EM, or optics lessons arrive, build them in the `physics/` framework's domain
+  packages (see `plans/ARCHITECTURE.md`) or add a focused, current dependency at
+  that point — do not re-add `manim-physics`.
 
-Do not reach for `manim-physics` to replace the deliberately-exact, hand-computed
+Do not reach for the sim engine to replace the deliberately-exact, hand-computed
 vectors this skill mandates elsewhere (Rules 2 and 5) — those need to show a
 *specific, checkable* value (e.g. `v = omega R` exactly at the contact point).
-Use `manim-physics` when the pedagogical point is emergent/simulated behavior,
+Use the sim engine when the pedagogical point is emergent/simulated behavior,
 not when it's a precise textbook relationship being illustrated.
 
-### 10.1 Real API surface (0.2.4) — the readthedocs layout is for a newer version
+### 10.1 API surface
 
-The installed `0.2.4` package is **flat modules**, not the nested
-`manim_physics.rigid_mechanics.rigid_mechanics` package shown on the current
-readthedocs site (that's the `0.4.0` layout, which we can't use — see above).
-For `0.2.4`, everything is exported from the top level:
+Import from the vendored module:
 
 ```python
-from manim_physics import SpaceScene, Space, Pendulum, MultiPendulum
+from physics_through_anim.sim import SpaceScene, Space
 ```
 
-`SpaceScene.make_rigid_body(*mobs, elasticity=0.8, density=1, friction=0.8)`
-only knows how to wrap `Circle`, `Line`, `Rectangle`/subclasses, and
-`Polygram`/subclasses (see `get_shape` in `rigid_mechanics.py`) — passing any
-other mobject type raises an `AttributeError` with no useful message pointing
-at the cause. Stick to those shapes for rigid bodies.
+`SpaceScene.make_rigid_body(*mobs, elasticity=0.8, density=1, friction=0.8)` and
+`make_static_body(*mobs, elasticity=1, friction=0.8)` only know how to wrap
+`Circle`, `Line`, `Rectangle`/subclasses, and `Polygram`/subclasses (see
+`get_shape` in `sim/space.py`) — passing any other mobject type raises an
+`AttributeError`. Stick to those shapes for rigid bodies.
 
 ### 10.2 Gotcha: attach visual-only markers *after* `make_rigid_body`, never before
 
@@ -448,7 +440,7 @@ finding must say what's wrong and where:
    any wheel/diagram in frame)?
 9. **Rule 9** — is all plain-English text confined to the bottom band, with
    only symbols on/beside diagrams and vectors?
-10. **Rule 10** (only if `manim-physics` is used) — pinned `0.2.4` API surface,
+10. **Rule 10** (only if the sim engine is used) — vendored `SpaceScene` API,
     markers attached *after* `make_rigid_body`, initial velocities tuned
     against frame width/wait time, no caption overflow, narration wired
     manually since `SpaceScene` doesn't inherit it.

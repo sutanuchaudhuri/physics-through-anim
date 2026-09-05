@@ -22,8 +22,8 @@ help: ## Show this help (all targets and their descriptions)
 	@echo ""
 	@echo "Common variables: QUALITY={low|medium|high}  NARRATION={off|auto|required}  SCENE=<id|chapter|all>"
 
-setup: ## Install Python 3.11 and sync dependencies (first-time setup)
-	uv python install 3.11
+setup: ## Install Python 3.12 and sync dependencies (first-time setup)
+	uv python install 3.12
 	uv sync --extra dev
 
 sync: ## Sync dependencies from uv.lock

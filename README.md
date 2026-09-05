@@ -11,7 +11,7 @@ scalable, multi-domain physics-framework namespace. The flagship 28-scene
 
 ```bash
 brew install cairo pkg-config   # macOS system deps for pycairo
-uv python install 3.11
+uv python install 3.12          # 3.11-3.13 all supported
 uv sync --extra dev
 uv run manim checkhealth        # confirm Manim + LaTeX + dvisvgm are working
 ```
@@ -39,7 +39,7 @@ Run `make help` for a self-documenting list. Common variables: `QUALITY`
 | Target | What it does |
 | --- | --- |
 | `make help` | List every target and its description (default goal) |
-| `make setup` | Install Python 3.11 and sync dependencies (first-time) |
+| `make setup` | Install Python 3.12 and sync dependencies (first-time) |
 | `make sync` | Sync dependencies from `uv.lock` |
 | `make health` | Verify Manim + LaTeX + dvisvgm |
 | `make list` | List planned topics and scene names |

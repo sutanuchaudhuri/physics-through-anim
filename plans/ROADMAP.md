@@ -62,7 +62,7 @@ tests/                          import and registry smoke tests
 ```bash
 # Manim Community's recommended local setup uses uv.
 brew install cairo pkg-config
-uv python install 3.11
+uv python install 3.12
 uv sync
 uv run manim checkhealth
 uv run python main.py --help

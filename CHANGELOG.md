@@ -14,8 +14,17 @@ All notable changes to this project are documented here. The format is based on
   Jira project (**PAC — Physics Animation Creator**) that tracks the asset-library
   and fluids roadmap.
 - Self-documenting `make help` that lists every target and its description.
+- Promoted the physics framework to a scalable, cross-domain namespace
+  `physics_through_anim.physics` (core/kinematics/shared + domain packages);
+  documented in `plans/ARCHITECTURE.md` and `plans/DIAGRAMS.md`.
+- Vendored a pymunk `SpaceScene` at `src/physics_through_anim/sim/` replacing the
+  `manim-physics` rigid-body plugin.
 
 ### Changed
+- Replaced the `manim-physics==0.2.4` dependency with `pymunk` and raised the
+  Python cap to `>=3.11,<3.14` (3.12 and 3.13 now supported). Added an
+  `audioop-lts` shim for 3.13 (pydub still imports the removed stdlib `audioop`).
+  Verified: 19 tests pass and the pymunk scenes render on 3.11, 3.12, and 3.13.
 - Merged `documents/plan.md` into `plans/ROADMAP.md`; removed the `documents/`
   folder so all planning lives under `plans/`.
 - Rewrote `README.md`: added a Jira reference, a full table of `make` commands,
