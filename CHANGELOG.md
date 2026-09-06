@@ -19,6 +19,13 @@ All notable changes to this project are documented here. The format is based on
   documented in `plans/ARCHITECTURE.md` and `plans/DIAGRAMS.md`.
 - Vendored a pymunk `SpaceScene` at `src/physics_through_anim/sim/` replacing the
   `manim-physics` rigid-body plugin.
+- TDD scaffold for milestone **M1.5** (`physics/core/{pose,refs,loads}`,
+  `physics/mechanics/{massprops,rigidbody}`) with a red/green spec suite
+  (`tests/test_m1_5_pose_rigidbody.py`) and `plans/asset_library/M01_5_TESTPLAN.md`.
+- TDD scaffold for milestones **M1.6–M18**: stub modules across
+  `physics/{core,kinematics,mechanics,mechanics3d,overlays,recipes,problems}` plus
+  a per-milestone spec file each and `plans/asset_library/SCAFFOLD_STATUS.md`
+  (suite: 50 passed, 38 xfailed).
 
 ### Changed
 - Replaced the `manim-physics==0.2.4` dependency with `pymunk` and raised the

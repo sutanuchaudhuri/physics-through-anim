@@ -26,6 +26,7 @@ status; these documents are the source of truth for design.
 | [DIAGRAMS.md](DIAGRAMS.md) | Entity/class, flow, and sequence diagrams (Mermaid + PlantUML) |
 | [physics_asset_library.md](physics_asset_library.md) | Signed-off overview of the composable asset library |
 | [asset_library/](asset_library/) | Per-milestone plans M1–M18 (see [asset_library/README.md](asset_library/README.md)) |
+| [asset_library/SCAFFOLD_STATUS.md](asset_library/SCAFFOLD_STATUS.md) | TDD scaffold status for M1–M18 + how to run the tests |
 | [fluids/](fluids/) | Fluids domain plans F1–F6 (see [fluids/README.md](fluids/README.md)) |
 | [rolling_slipping_concepts_misconcepts.md](rolling_slipping_concepts_misconcepts.md) | Source spec for the flagship 28-scene rolling/slipping lesson |
 | [rod_slipping_new_edge.md](rod_slipping_new_edge.md) | Plan for the rod-slipping-at-an-edge lesson |
