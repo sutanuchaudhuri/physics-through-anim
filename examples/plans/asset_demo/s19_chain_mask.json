@@ -1,0 +1,15 @@
+{
+  "problem": {"problem_id": "S19", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "peg", "name": "left", "params": {"at": [-3.0, 1.4]}},
+    {"kind": "peg", "name": "right", "params": {"at": [3.0, 1.4]}}
+  ],
+  "masks": [
+    {"kind": "chain", "color": "#74c0fc", "opacity": 0.5, "points": [[-3.0, 1.4], [-2.0, 0.4], [-1.0, -0.2], [0.0, -0.4], [1.0, -0.2], [2.0, 0.4], [3.0, 1.4]]}
+  ],
+  "markers": [
+    {"at": "left.at", "label": "A (start)", "color": "#ffd43b", "placement": "top_left"},
+    {"at": "right.at", "label": "B (end)", "color": "#ffd43b", "placement": "top_right"},
+    {"point": [0.0, -0.4], "label": "lowest (CM)", "color": "#ff4444", "placement": "bottom"}
+  ]
+}

@@ -3,7 +3,7 @@ SHELL := /bin/bash
 
 .PHONY: help setup sync health list render render-rolling stitch-rolling render-rod \
         stitch-rod render-lesson stitch-lesson compile stitch-compilation \
-        list-compilations publish-prepare publish-complete list-publications \
+        list-compilations render-plan validate-plan publish-prepare publish-complete list-publications \
         test check clean
 
 # ---------------------------------------------------------------------------
@@ -64,6 +64,12 @@ stitch-compilation: ## Rebuild a defined compilation from compilations.toml (NAM
 
 list-compilations: ## List all defined compilations and their scenes
 	@uv run python main.py list-compilations
+
+render-plan: ## Render a scene from a JSON/XML plan (PLAN= RENDERER=svg OUTPUT=)
+	uv run python main.py render-plan $(or $(PLAN),examples/plans/demo_scene.json) --renderer $(or $(RENDERER),svg) $(if $(OUTPUT),--output $(OUTPUT),)
+
+validate-plan: ## Validate a JSON/XML plan and list every key/value error (PLAN=)
+	uv run python main.py validate-plan $(or $(PLAN),examples/plans/demo_scene.json)
 
 publish-prepare: ## Persist a pending publish record (SOURCE= TITLE= DESCRIPTION=)
 	uv run python main.py publish-prepare $(SOURCE) --title "$(TITLE)" --description "$(DESCRIPTION)" --tags "$(or $(TAGS),)" --visibility $(or $(VISIBILITY),unlisted) --slug "$(or $(SLUG),)" --quality $(or $(QUALITY),high)

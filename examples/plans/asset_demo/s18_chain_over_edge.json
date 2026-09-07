@@ -1,0 +1,20 @@
+{
+  "problem": {"problem_id": "S18", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "table", "name": "table", "params": {"top_y": 0.0, "left": -3.0, "right": 1.0, "color": "#9aa4b2"}},
+    {"kind": "edge", "name": "corner", "params": {"at": [1.0, 0.0]}}
+  ],
+  "masks": [
+    {"kind": "chain", "color": "#40c057", "opacity": 0.5, "points": [[-2.6, 0.12], [-1.8, 0.12], [-1.0, 0.12], [-0.2, 0.12], [0.6, 0.12], [1.0, 0.06], [1.05, -0.6], [1.05, -1.5], [1.05, -2.4]]}
+  ],
+  "vectors": [
+    {"anchor": "corner.E", "vector": [0.0, -1.0], "role": "weight", "label": "hanging weight pulls", "placement": "right"}
+  ],
+  "markers": [
+    {"at": "corner.E", "label": "edge", "color": "#ff4444", "placement": "top_right"},
+    {"point": [-1.0, 0.12], "label": "CM resting", "color": "#4dabf7", "placement": "top"},
+    {"point": [1.05, -1.5], "label": "CM hanging", "color": "#4dabf7", "placement": "right"},
+    {"point": [-2.6, 0.12], "label": "start", "color": "#ffd43b", "placement": "top_left"},
+    {"point": [1.05, -2.4], "label": "end", "color": "#ffd43b", "placement": "bottom_left"}
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "problem": {"problem_id": "DEMO-EDGE", "source_id": "demo"},
+  "entities": [
+    {"kind": "table", "name": "table", "params": {"top_y": 0.0, "left": -3.0, "right": 3.0, "color": "#9aa4b2"}, "style": {"fill": "hashed"}},
+    {"kind": "edge", "name": "corner", "params": {"at": [3.0, 0.0]}},
+    {"kind": "cylinder", "name": "cyl_rest", "params": {"position": [1.6, 0.6], "radius": 0.6, "color": "#74c0fc"}, "style": {"show_corners": true, "corner_labels": true}},
+    {"kind": "cylinder", "name": "pivot_1", "params": {"position": [3.0, 0.6], "radius": 0.6, "color": "#ffa94d", "show_cm": false, "show_weight": false}, "style": {"display": "fade"}},
+    {"kind": "cylinder", "name": "pivot_2", "params": {"position": [3.3, 0.52], "radius": 0.6, "color": "#ffa94d", "show_cm": false, "show_weight": false}, "style": {"display": "fade"}},
+    {"kind": "cylinder", "name": "pivot_3", "params": {"position": [3.52, 0.3], "radius": 0.6, "color": "#ffa94d", "show_cm": false, "show_weight": false}, "style": {"display": "fade"}},
+    {"kind": "cylinder", "name": "pivot_4", "params": {"position": [3.6, 0.0], "radius": 0.6, "color": "#ffa94d", "show_cm": false, "show_weight": false}, "style": {"display": "fade"}},
+    {"kind": "cylinder", "name": "fall_1", "params": {"position": [3.95, -0.7], "radius": 0.6, "color": "#868e96", "show_cm": false, "show_weight": false}, "style": {"display": "dotted"}},
+    {"kind": "cylinder", "name": "fall_2", "params": {"position": [4.2, -2.0], "radius": 0.6, "color": "#868e96", "show_cm": false, "show_weight": false}, "style": {"display": "dotted"}},
+    {"kind": "cylinder", "name": "fall_3", "params": {"position": [4.4, -3.4], "radius": 0.6, "color": "#868e96", "show_cm": false, "show_weight": false}, "style": {"display": "dotted"}}
+  ],
+  "relations": [
+    {"kind": "rolling", "participants": ["cyl_rest", "table"], "params": {"radius": 0.6, "name": "roll_on_table"}},
+    {"kind": "pin", "participants": ["pivot_1", "table"], "params": {"at": "corner.E", "name": "edge_hinge"}}
+  ],
+  "vectors": [
+    {"anchor": "cyl_rest.bottom", "vector": [0.0, 0.6], "label": "contact->CM", "role": "normal"},
+    {"anchor": "corner.E", "vector": [0.0, 0.6], "role": "position"},
+    {"anchor": "corner.E", "vector": [0.52, 0.3], "role": "position"},
+    {"anchor": "corner.E", "vector": [0.6, 0.0], "label": "r (rotates about hinge)", "role": "position"}
+  ],
+  "paths": [
+    {"points": [[3.0, 0.6], [3.3, 0.52], [3.52, 0.3], [3.6, 0.0], [3.95, -0.7], [4.2, -2.0], [4.4, -3.4]], "color": "#ffd43b", "label": "CM path (arc -> parabola)"}
+  ],
+  "markers": [
+    {"at": "corner.E", "label": "pivot (hinge)", "color": "#ff4444"}
+  ],
+  "steps": [
+    {"kind": "initialize", "at": 0.0, "label": "cylinder rests; the top corner is the pivot"},
+    {"kind": "timestep", "at": 0.0, "dt": 0.1, "label": "rotate about the corner; r vector rotates"},
+    {"kind": "scene_change", "at": 1.0, "label": "loses contact -> CM traces a parabola", "params": {"deactivate": ["edge_hinge", "roll_on_table"]}}
+  ]
+}
+
+

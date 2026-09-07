@@ -14,10 +14,29 @@ trying candidate sides in a fixed order.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from enum import StrEnum
 
 import numpy as np
 from manim import DOWN, LEFT, RIGHT, UP, Mobject, Rectangle, VGroup, config
+
+
+class Anchor(StrEnum):
+    """A named position inside a region -- use instead of eyeballed coordinates.
+
+    Numeric coordinates are the *last resort* (``CUSTOM``); prefer a named anchor
+    plus an optional ``offset`` override.
+    """
+
+    CENTER = "center"
+    TOP = "top"
+    BOTTOM = "bottom"
+    LEFT = "left"
+    RIGHT = "right"
+    TOP_LEFT = "top_left"
+    TOP_RIGHT = "top_right"
+    BOTTOM_LEFT = "bottom_left"
+    BOTTOM_RIGHT = "bottom_right"
 
 
 def _aabb(mob: Mobject) -> tuple[float, float, float, float]:
@@ -54,6 +73,43 @@ class Region:
     @property
     def center(self) -> np.ndarray:
         return np.array([(self.x_min + self.x_max) / 2.0, (self.y_min + self.y_max) / 2.0, 0.0])
+
+    def anchor(self, where: Anchor = Anchor.CENTER, *, offset=(0.0, 0.0),
+               pad: float = 0.0) -> np.ndarray:
+        """The scene point at a named ``Anchor`` inside this region (+ optional ``offset``).
+
+        e.g. ``left.anchor(Anchor.BOTTOM)`` for a panel title, instead of a magic
+        ``[3.4, -1.7, 0.0]``. ``offset`` is the escape hatch when a nudge is needed.
+        """
+        x0, x1 = self.x_min + pad, self.x_max - pad
+        y0, y1 = self.y_min + pad, self.y_max - pad
+        cx, cy = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+        table = {
+            Anchor.CENTER: (cx, cy),
+            Anchor.TOP: (cx, y1), Anchor.BOTTOM: (cx, y0),
+            Anchor.LEFT: (x0, cy), Anchor.RIGHT: (x1, cy),
+            Anchor.TOP_LEFT: (x0, y1), Anchor.TOP_RIGHT: (x1, y1),
+            Anchor.BOTTOM_LEFT: (x0, y0), Anchor.BOTTOM_RIGHT: (x1, y0),
+        }
+        px, py = table[Anchor(where)]
+        return np.array([px + offset[0], py + offset[1], 0.0])
+
+    def columns(self, n: int, *, gap: float = 0.0) -> list[Region]:
+        """Split into ``n`` equal side-by-side sub-regions (e.g. two panels)."""
+        w = (self.width - gap * (n - 1)) / n
+        return [Region(self.x_min + i * (w + gap), self.x_min + i * (w + gap) + w,
+                       self.y_min, self.y_max, f"{self.name}:col{i}") for i in range(n)]
+
+    def rows(self, n: int, *, gap: float = 0.0) -> list[Region]:
+        """Split into ``n`` equal stacked sub-regions (top row first)."""
+        h = (self.height - gap * (n - 1)) / n
+        return [Region(self.x_min, self.x_max,
+                       self.y_max - i * (h + gap) - h, self.y_max - i * (h + gap),
+                       f"{self.name}:row{i}") for i in range(n)]
+
+    def grid(self, rows: int, cols: int, *, gap: float = 0.0) -> list[Region]:
+        """A row-major list of ``rows*cols`` equal cells (a thumbnail grid)."""
+        return [cell for row in self.rows(rows, gap=gap) for cell in row.columns(cols, gap=gap)]
 
     def contains(self, mob: Mobject, *, padding: float = 0.0) -> bool:
         x0, x1, y0, y1 = _aabb(mob)
@@ -101,6 +157,69 @@ def standard_bands(*, margin: float = 0.3, ground_y: float = -2.0) -> dict[str, 
         "equation": Region(-half_w, half_w, -3.9, -2.3, "equation"),
         "caption": Region(-half_w, half_w, -3.85, -2.4, "caption"),
     }
+
+
+def stage_region(*, margin: float = 0.4, ground_y: float = -2.2, top: float = 2.4) -> Region:
+    """The usable acting area as one :class:`Region` (for ``.columns``/``.anchor``)."""
+    half_w = config.frame_width / 2.0 - margin
+    return Region(-half_w, half_w, ground_y, top, "stage")
+
+
+def _p2(point) -> np.ndarray:
+    return np.asarray(point, dtype=float)[:2]
+
+
+@dataclass
+class NamedPoints:
+    """A registry of developer-named points -- reference coordinates by **id/enum**
+    instead of repeating raw tuples. Keys are strings; ``StrEnum`` members work too
+    (e.g. ``class P(StrEnum): LEFT_END = "L"`` -> ``pts[P.LEFT_END]``). It also gives
+    the **distance/vector between points by id**, so a translation is named, not
+    a magic number.
+    """
+
+    points: dict = field(default_factory=dict)
+
+    def set(self, key, point) -> np.ndarray:
+        """Register (or overwrite) the point named ``key``; returns it."""
+        self.points[str(key)] = _p2(point)
+        return self.points[str(key)]
+
+    def define(self, **named) -> NamedPoints:
+        """Bulk-define points: ``pts.define(A=(-4.5, 1.2), B=(1.5, 1.2))``."""
+        for key, point in named.items():
+            self.set(key, point)
+        return self
+
+    def at(self, key, region: Region, anchor: Anchor = Anchor.CENTER, *,
+           offset=(0.0, 0.0), pad: float = 0.0) -> np.ndarray:
+        """Register ``key`` at a region anchor (compose the two layout helpers)."""
+        return self.set(key, region.anchor(anchor, offset=offset, pad=pad)[:2])
+
+    def __getitem__(self, key) -> np.ndarray:
+        return self.points[str(key)]
+
+    def get(self, key, default=None):
+        return self.points.get(str(key), default)
+
+    def __contains__(self, key) -> bool:
+        return str(key) in self.points
+
+    def vector(self, a, b) -> np.ndarray:
+        """The translation ``b - a`` between two named points."""
+        return self[b] - self[a]
+
+    def distance(self, a, b) -> float:
+        """The translation distance between two named points, by id."""
+        return float(np.linalg.norm(self[b] - self[a]))
+
+    def midpoint(self, a, b) -> np.ndarray:
+        return (self[a] + self[b]) / 2.0
+
+    def shifted(self, key, offset) -> np.ndarray:
+        """A copy of point ``key`` nudged by ``offset`` (not registered)."""
+        return self[key] + _p2(offset)
+
 
 
 @dataclass

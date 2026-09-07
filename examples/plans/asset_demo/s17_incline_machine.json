@@ -1,0 +1,19 @@
+{
+  "problem": {"problem_id": "S17", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.7, "half_width": 5.5}},
+    {"kind": "incline", "name": "ramp", "params": {"angle_deg": 27.0, "length": 6.4, "base": [-3.9, -2.7]}},
+    {"kind": "block", "name": "m", "params": {"position": [-1.4, 0.1], "width": 0.84, "height": 0.6, "label": "m"}},
+    {"kind": "linear_spring", "name": "spring", "params": {"from_point": [-3.0, -0.5], "to_point": [-1.9, 0.0]}},
+    {"kind": "pulley", "name": "pulley", "params": {"center": [1.3, 0.9], "radius": 0.34, "rope_angles": {"in": 150.0, "out": 30.0}}},
+    {"kind": "block", "name": "M", "params": {"position": [2.35, -0.8], "width": 0.72, "height": 0.72, "label": "M"}},
+    {"kind": "rope", "name": "rope", "params": {"from_ref": "pulley.out", "to_ref": "M.top", "tension_label": "T"}}
+  ],
+  "relations": [
+    {"kind": "rolling", "participants": ["m", "ramp"], "params": {"radius": 0.42, "name": "roll"}}
+  ],
+  "vectors": [
+    {"anchor": "M.top", "vector": [0.0, 1.0], "role": "tension", "label": "T"},
+    {"anchor": "M.CM", "vector": [0.0, -1.0], "role": "weight", "label": "Mg"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "problem": {"problem_id": "S22", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "rod", "name": "rod", "params": {"mass": 1.0, "length": 3.0, "center": [-0.3, 0.4]}}
+  ],
+  "vectors": [
+    {"anchor": "rod.CM", "vector": [0.0, 1.2], "role": "force", "label": "J (impulse)"}
+  ],
+  "markers": [
+    {"at": "rod.CM", "label": "CM (delta v)", "color": "#ff4444"}
+  ]
+}

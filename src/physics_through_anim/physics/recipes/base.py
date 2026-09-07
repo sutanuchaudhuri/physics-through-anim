@@ -1,7 +1,9 @@
-"""Recipe: textbook compositions (Milestone M15). Scaffold.
+"""Recipe: textbook compositions (Milestone M15).
 
-A Recipe stores specs (not VGroups): assembly + events + overlays + trajectories +
-named moments, so an AI/human can drive it without knowing internals.
+A ``Recipe`` stores **specs** (not VGroups): a semantic ``Assembly`` + an event
+timeline + named overlays/trajectories/moments/camera anchors. A human writes
+``kepler_orbit(e=0.6)``; an AI builds the same graph; both yield the same
+declarative bundle a renderer/scene can drive without knowing internals.
 """
 
 from __future__ import annotations
@@ -19,5 +21,14 @@ class Recipe:
     camera_anchors: dict = field(default_factory=dict)
 
     def named(self, key: str) -> object:
-        """Resolve a named body/point/overlay/moment."""
-        raise NotImplementedError("M15 Recipe.named")
+        """Resolve a named body / overlay / trajectory / moment / camera anchor."""
+        if self.assembly is not None and hasattr(self.assembly, "body"):
+            try:
+                return self.assembly.body(key)
+            except (KeyError, ValueError):
+                pass
+        for table in (self.overlays, self.trajectories, self.moments, self.camera_anchors):
+            if key in table:
+                return table[key]
+        raise KeyError(f"Recipe has nothing named '{key}'.")
+

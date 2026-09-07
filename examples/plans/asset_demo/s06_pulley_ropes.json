@@ -1,0 +1,30 @@
+{
+  "problem": {"problem_id": "S06", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "ceiling", "name": "ceiling", "params": {"y": 3.0, "half_width": 4.5}},
+    {"kind": "pulley", "name": "pulley", "params": {"center": [0.0, 1.8], "radius": 0.7, "rope_angles": {"left": 225.0, "right": 315.0}}, "label": {"show": false}},
+    {"kind": "hinge", "name": "axle", "params": {"at": [0.0, 1.8]}, "label": {"show": false}},
+    {"kind": "particle", "name": "m_1", "params": {"position": [-0.5, 0.0]}, "place": {"at": "pulley.left", "my": "CM", "offset": [0.0, -1.4]}, "label": {"show": false}},
+    {"kind": "particle", "name": "m_2", "params": {"position": [0.5, 0.0]}, "place": {"at": "pulley.right", "my": "CM", "offset": [0.0, -2.0]}, "label": {"show": false}},
+    {"kind": "rope", "name": "rope_a", "params": {"from_ref": "pulley.left", "to_ref": "m_1.CM", "tension_label": "T"}},
+    {"kind": "rope", "name": "rope_b", "params": {"from_ref": "pulley.right", "to_ref": "m_2.CM", "tension_label": "T", "slips": true}}
+  ],
+  "relations": [
+    {"kind": "hang", "participants": ["pulley", "ceiling"]}
+  ],
+  "masks": [
+    {"kind": "box", "at": "m_1.CM", "width": 0.7, "length": 0.6, "color": "#4dabf7", "opacity": 0.35},
+    {"kind": "box", "at": "m_2.CM", "width": 0.7, "length": 0.6, "color": "#4dabf7", "opacity": 0.35}
+  ],
+  "vectors": [
+    {"anchor": "m_1.CM", "vector": [0.0, -1.0], "role": "weight", "label": "m_1 g", "placement": "left"},
+    {"anchor": "m_2.CM", "vector": [0.0, -1.0], "role": "weight", "label": "m_2 g", "placement": "right"}
+  ],
+  "markers": [
+    {"at": "axle.H", "label": "hinge (axle)", "color": "#ffd43b", "placement": "top_right"},
+    {"at": "pulley.left", "label": "string touch", "color": "#ff4444", "show_label": false},
+    {"at": "pulley.right", "label": "string touch", "color": "#ff4444", "show_label": false},
+    {"at": "m_1.CM", "label": "CM m_1 (point mass)", "color": "#4dabf7", "placement": "bottom_left"},
+    {"at": "m_2.CM", "label": "CM m_2 (point mass)", "color": "#4dabf7", "placement": "bottom_right"}
+  ]
+}

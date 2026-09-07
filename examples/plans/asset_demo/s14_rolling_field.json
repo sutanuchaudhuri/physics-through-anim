@@ -1,0 +1,15 @@
+{
+  "problem": {"problem_id": "S14", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.0, "half_width": 5.0}},
+    {"kind": "disk", "name": "d", "params": {"position": [0.0, -1.4], "radius": 0.6, "label": "m"}}
+  ],
+  "vectors": [
+    {"anchor": "d.top", "vector": [1.8, 0.0], "role": "velocity", "label": "2v"},
+    {"anchor": "d.right", "vector": [0.0, -1.2], "role": "velocity", "label": "v"},
+    {"anchor": "d.left", "vector": [0.0, 1.2], "role": "velocity", "label": "v"}
+  ],
+  "markers": [
+    {"at": "d.bottom", "label": "IC (v=0)", "color": "#ff4444"}
+  ]
+}

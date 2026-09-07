@@ -1,0 +1,16 @@
+{
+  "problem": {"problem_id": "S20", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.0, "half_width": 5.5}},
+    {"kind": "wall", "name": "wall", "params": {"angle_deg": 90.0, "center": [-4.5, -1.0], "length": 2.0}},
+    {"kind": "block", "name": "M", "params": {"position": [1.5, -1.5], "width": 1.4, "label": "M"}},
+    {"kind": "block", "name": "m", "params": {"position": [-1.0, -1.65], "width": 0.7, "label": "m"}}
+  ],
+  "vectors": [
+    {"anchor": "M.CM", "vector": [-1.6, 0.0], "role": "momentum", "label": "V"},
+    {"anchor": "m.CM", "vector": [-1.0, 0.0], "role": "momentum", "label": "v"}
+  ],
+  "markers": [
+    {"point": [-4.5, 0.2], "label": "elastic wall", "color": "#ff4444"}
+  ]
+}

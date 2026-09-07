@@ -1,0 +1,20 @@
+{
+  "problem": {"problem_id": "S05", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.4, "half_width": 5.0}},
+    {"kind": "incline", "name": "ramp", "params": {"angle_deg": 28.0, "length": 6.0, "base": [-3.6, -2.4]}},
+    {"kind": "cylinder", "name": "m", "params": {"position": [0.0, 0.2], "radius": 0.5, "label": "m"}, "place": {"on": "ramp"}, "label": {"show": false}}
+  ],
+  "relations": [
+    {"kind": "rolling", "participants": ["m", "ramp"], "params": {"radius": 0.5, "name": "roll"}}
+  ],
+  "vectors": [
+    {"anchor": "m.CM", "vector": [0.0, -1.1], "role": "weight", "label": "mg", "placement": "right"},
+    {"anchor": "m.contact", "vector": [-0.47, 0.88], "role": "normal", "label": "N", "placement": "top_left"},
+    {"anchor": "m.contact", "vector": [0.88, 0.47], "role": "friction", "label": "f", "placement": "bottom_right"}
+  ],
+  "markers": [
+    {"at": "m.contact", "label": "contact point", "color": "#ff4444", "placement": "bottom_right"},
+    {"at": "m.CM", "label": "CM", "color": "#ff4444", "placement": "top_right"}
+  ]
+}

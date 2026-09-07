@@ -78,6 +78,26 @@ def build_parser() -> argparse.ArgumentParser:
     stitch_lesson_parser.add_argument("lesson", choices=registry.all_lesson_names())
     stitch_lesson_parser.add_argument("--quality", choices=("low", "medium", "high"), default="low")
 
+    render_plan_parser = subparsers.add_parser(
+        "render-plan",
+        help="Render a scene straight from a JSON/XML ProblemScenePlan via a pluggable engine.",
+    )
+    render_plan_parser.add_argument("plan_file", help="Path to a .json or .xml plan.")
+    render_plan_parser.add_argument(
+        "--renderer", default="svg",
+        help="Render engine: svg (default, real), manim (prime, scaffold), "
+             "matplotlib/plotly/pymunk (scaffold).",
+    )
+    render_plan_parser.add_argument(
+        "--output", default=None, help="Output path (default: plan file with the engine suffix)."
+    )
+
+    validate_plan_parser = subparsers.add_parser(
+        "validate-plan",
+        help="Check a JSON/XML ProblemScenePlan and list every key/value error.",
+    )
+    validate_plan_parser.add_argument("plan_file", help="Path to a .json or .xml plan.")
+
     compile_parser = subparsers.add_parser(
         "compile",
         help=(
@@ -172,6 +192,33 @@ def main(argv: list[str] | None = None) -> int:
         return render_lesson_scene(args.lesson, args.scene, args.quality, args.narration)
     if args.command == "stitch-lesson":
         return stitch_lesson(args.lesson, args.quality)
+    if args.command == "render-plan":
+        from physics_through_anim.physics.rendering import render_plan_file
+        from physics_through_anim.physics.serialization import PlanValidationError
+        try:
+            written = render_plan_file(
+                args.plan_file, renderer=args.renderer, output=args.output
+            )
+        except PlanValidationError as exc:
+            print(f"Plan '{args.plan_file}' has {len(exc.errors)} error(s):")
+            for err in exc.errors:
+                print(f"  - {err}")
+            return 1
+        except NotImplementedError as exc:
+            print(f"Renderer '{args.renderer}' is not available: {exc}")
+            return 1
+        print(f"Rendered {args.plan_file} -> {written}")
+        return 0
+    if args.command == "validate-plan":
+        from physics_through_anim.physics.rendering import validate_plan_file
+        errors = validate_plan_file(args.plan_file)
+        if not errors:
+            print(f"{args.plan_file}: valid")
+            return 0
+        print(f"{args.plan_file}: {len(errors)} error(s):")
+        for err in errors:
+            print(f"  - {err}")
+        return 1
     if args.command == "compile":
         return compile_video(
             args.name, args.lesson, args.scenes, args.quality, args.narration, args.output

@@ -607,3 +607,15 @@ class_name = "KeplerOrbit"
 narration = "s25_kepler_orbit"
 chapter = "demo"
 
+[lessons.asset_demo.scenes."26"]
+file = "s26_accelerating_truck.py"
+class_name = "AcceleratingTruck"
+narration = "s26_accelerating_truck"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."27"]
+file = "s27_recipe_gallery.py"
+class_name = "RecipeGallery"
+narration = "s27_recipe_gallery"
+chapter = "demo"
+

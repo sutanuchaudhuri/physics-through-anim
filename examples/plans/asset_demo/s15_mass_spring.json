@@ -1,0 +1,15 @@
+{
+  "problem": {"problem_id": "S15", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.0, "half_width": 5.0}},
+    {"kind": "wall", "name": "wall", "params": {"angle_deg": 90.0, "center": [-3.6, -1.4], "length": 1.6}},
+    {"kind": "block", "name": "m", "params": {"position": [0.0, -1.58], "width": 0.9, "label": "m"}},
+    {"kind": "linear_spring", "name": "spring", "params": {"from_point": [-3.6, -1.58], "to_point": [-0.45, -1.58]}}
+  ],
+  "vectors": [
+    {"anchor": "m.left", "vector": [-1.2, 0.0], "role": "spring", "label": "F = -kx"}
+  ],
+  "markers": [
+    {"point": [-1.5, -1.58], "label": "equilibrium", "color": "#ffd43b"}
+  ]
+}

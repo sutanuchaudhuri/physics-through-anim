@@ -29,6 +29,8 @@ class VectorSpec:
     perpendicular_to: tuple[str, str] | None = None
     show_components: bool = False
     show_angle: bool = False
+    show_label: bool = True  # draw the arrow but suppress its label
+    placement: str = "auto"  # LabelPlacement value; "auto" -> plan default
 
 
 @dataclass(frozen=True)

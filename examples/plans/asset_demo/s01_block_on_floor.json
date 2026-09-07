@@ -1,0 +1,15 @@
+{
+  "problem": {"problem_id": "S01", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.0, "half_width": 5.0}},
+    {"kind": "block", "name": "m", "params": {"position": [0.0, -1.58], "width": 1.4, "label": "m"}, "place": {"on": "floor"}, "label": {"show": false}}
+  ],
+  "vectors": [
+    {"anchor": "m.CM", "vector": [0.0, -1.1], "role": "weight", "label": "mg", "placement": "right"},
+    {"anchor": "m.contact", "vector": [0.0, 1.1], "role": "normal", "label": "N", "placement": "top_right"}
+  ],
+  "markers": [
+    {"at": "m.contact", "label": "contact point", "color": "#ff4444", "placement": "bottom"},
+    {"at": "m.CM", "label": "CM", "color": "#ff4444", "placement": "top_left"}
+  ]
+}

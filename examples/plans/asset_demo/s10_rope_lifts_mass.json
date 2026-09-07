@@ -1,0 +1,24 @@
+{
+  "problem": {"problem_id": "S10", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "ceiling", "name": "ceiling", "params": {"y": 3.0, "half_width": 4.0}},
+    {"kind": "pulley", "name": "pulley", "params": {"center": [0.0, 1.8], "radius": 0.5, "rope_angles": {"in": 150.0, "out": 30.0}}, "label": {"show": false}},
+    {"kind": "hinge", "name": "axle", "params": {"at": [0.0, 1.8]}, "label": {"show": false}},
+    {"kind": "block", "name": "m", "params": {"position": [1.2, -0.6], "width": 0.8, "label": "m"}, "label": {"placement": "bottom"}},
+    {"kind": "rope", "name": "rope", "params": {"from_ref": "pulley.out", "to_ref": "m.top", "tension_label": "T"}}
+  ],
+  "relations": [
+    {"kind": "hang", "participants": ["pulley", "ceiling"]}
+  ],
+  "vectors": [
+    {"anchor": "m.top", "vector": [0.0, 1.0], "role": "tension", "label": "T"},
+    {"anchor": "m.CM", "vector": [0.0, -1.0], "role": "weight", "label": "mg"}
+  ],
+  "markers": [
+    {"at": "pulley.in", "label": "contact_a", "color": "#ff4444", "show_label": false},
+    {"at": "pulley.out", "label": "contact_b", "color": "#ff4444", "show_label": false},
+    {"at": "axle.H", "label": "pulley hinge (axle)", "color": "#ffd43b", "placement": "top_right"},
+    {"at": "m.top", "label": "rope touches block", "color": "#0ca678", "show_label": false},
+    {"at": "m.CM", "label": "CM of block", "color": "#4dabf7", "show_label": false}
+  ]
+}

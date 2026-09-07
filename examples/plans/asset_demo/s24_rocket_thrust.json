@@ -1,0 +1,17 @@
+{
+  "problem": {"problem_id": "S24", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "particle", "name": "rocket", "params": {"position": [0.0, 0.8], "label": "m"}, "label": {"show": false}}
+  ],
+  "masks": [
+    {"kind": "rocket", "at": "rocket.CM", "length": 1.8, "width": 0.7, "color": "#adb5bd", "opacity": 0.5},
+    {"kind": "plume", "point": [0.0, -0.1], "direction": [0.0, -1.0], "length": 2.4, "width": 0.7, "color": "#ff922b", "opacity": 0.45}
+  ],
+  "vectors": [
+    {"anchor": "rocket.CM", "vector": [0.0, 1.8], "role": "force", "label": "thrust = (dm/dt) u", "placement": "right"}
+  ],
+  "markers": [
+    {"at": "rocket.CM", "label": "CM", "color": "#4dabf7", "placement": "top_right"},
+    {"point": [0.0, -0.1], "label": "N (nozzle)", "color": "#ff4444", "placement": "bottom_left"}
+  ]
+}

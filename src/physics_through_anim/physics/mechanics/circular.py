@@ -20,7 +20,12 @@ from manim import BLUE, GRAY, YELLOW, Circle, Dot, Line, Mobject, VGroup
 
 from physics_through_anim.physics.mechanics.base import PhysicsAsset
 from physics_through_anim.physics.mechanics.constraints import FixedAxleConstraint
-from physics_through_anim.physics.mechanics.kinds import BodyDynamics, ForceKind, MotionState
+from physics_through_anim.physics.mechanics.kinds import (
+    Bearing,
+    BodyDynamics,
+    ForceKind,
+    MotionState,
+)
 from physics_through_anim.physics.mechanics.supports import Support
 
 Vec2 = tuple[float, float]
@@ -128,13 +133,23 @@ class Cylinder(CircularBody):
 
 @dataclass
 class Pulley(PhysicsAsset):
-    """A spinnable wheel with named rim tangent points where ropes leave (M4)."""
+    """A spinnable wheel with named rim tangent points where ropes leave (M4).
+
+    ``rope_angles`` maps *your own* labels to the departure ``Bearing`` (degrees,
+    math convention: 0 = East, counter-clockwise) at which each rope leaves the
+    rim. Pass a ``Bearing`` member (``Bearing.SW`` -- the render layer re-exports
+    it as ``Compass``) or a raw float. Every key becomes a rim keypoint resolvable
+    as ``"<name>.<key>"`` (via ``pulley.port(key)``); e.g. ``{"left": Bearing.SW}``
+    on a pulley named ``"pulley"`` yields the point ``"pulley.left"``. Defaults to
+    two ropes at 30 deg / 60 deg if you pass nothing.
+    """
 
     name: str = "pulley"
     center: Vec2 = (0.0, 2.0)
     radius: float = 0.5
     rotates: bool = True
-    rope_angles: dict[str, float] = field(default_factory=lambda: {"A": 30.0, "B": 60.0})
+    rope_angles: dict[str, Bearing | float] = field(
+        default_factory=lambda: {"A": 30.0, "B": 60.0})
     color: str = GRAY
     dynamics: BodyDynamics = BodyDynamics.STATIC
 

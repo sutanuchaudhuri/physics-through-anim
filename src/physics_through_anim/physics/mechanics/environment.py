@@ -22,7 +22,13 @@ from physics_through_anim.physics.mechanics.surfaces import InclineSurface
 
 @dataclass
 class Ceiling(Wall):
-    """A horizontal ceiling (normal down); anchors ropes/hinges (M4)."""
+    """A horizontal ceiling (normal down); anchors ropes/hinges (M4).
+
+    ``y`` is a world-frame height in the scene's coordinate frame -- the same axis
+    every body sits on, with the standard ground line at ``Level.GROUND`` (-2).
+    Prefer the ``Level`` tokens (``y=Level.CEILING``) so the height is
+    self-documenting; a raw float is always accepted as the escape hatch.
+    """
 
     name: str = "ceiling"
     angle_deg: float = 0.0

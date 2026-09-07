@@ -1,0 +1,12 @@
+{
+  "problem": {"problem_id": "S11", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "peg", "name": "p_a", "params": {"at": [-2.4, 1.2]}},
+    {"kind": "peg", "name": "p_b", "params": {"at": [0.6, 1.0]}},
+    {"kind": "slack_string", "name": "str", "params": {"from_point": [-2.4, 1.2], "to_point": [0.6, 1.0], "rest_length": 4.0}}
+  ],
+  "markers": [
+    {"at": "p_a.at", "label": "A", "color": "#ffd43b"},
+    {"at": "p_b.at", "label": "B", "color": "#ffd43b"}
+  ]
+}

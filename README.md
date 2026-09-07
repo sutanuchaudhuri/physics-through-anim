@@ -53,12 +53,38 @@ Run `make help` for a self-documenting list. Common variables: `QUALITY`
 | `make compile LESSON= SCENES= NAME=` | Build a named, arbitrary-order compilation |
 | `make stitch-compilation NAME=<name>` | Rebuild a compilation from `compilations.toml` |
 | `make list-compilations` | List defined compilations |
+| `make render-plan PLAN=<file>` | Render a scene from a JSON/XML plan (`RENDERER=svg` default) |
+| `make validate-plan PLAN=<file>` | Validate a plan and list every key/value error |
 | `make publish-prepare SOURCE= TITLE= DESCRIPTION=` | Persist a pending publish record |
 | `make publish-complete SLUG= VIDEO_ID= URL=` | Record a completed upload |
 | `make list-publications` | List publish records and status |
 | `make test` | Run the test suite |
 | `make check` | Lint (ruff) and run tests |
 | `make clean` | Remove rendered media, caches, and draft audio |
+
+## Spec-driven scenes (JSON/XML)
+
+Scenes can be authored as configuration and rendered through a pluggable engine —
+no Python required. A `ProblemScenePlan` (entities, relations, and timeline
+`steps`) round-trips losslessly through JSON and XML, builds into a live
+`Assembly`, and renders via a named engine. See
+[docs/spec_driven_serialization.md](docs/spec_driven_serialization.md) for the
+full guide.
+
+```bash
+# Render the bundled example plan to an SVG snapshot (dependency-free, real):
+make render-plan
+# ...equivalently:
+python main.py render-plan examples/plans/demo_scene.json --renderer svg --output scene.svg
+
+# Your own plan + engine (relative or absolute path):
+make render-plan PLAN=path/to/scene.xml RENDERER=svg OUTPUT=scene.svg
+```
+
+Engines: `manim` (renders a styled still PNG), `svg` (working snapshot),
+`matplotlib` / `plotly` / `pymunk` (scaffolded; `matplotlib`/`plotly` need the
+`viz` extra: `uv sync --extra viz`). The `PLAN` path is resolved from the repo
+root; the bundled example lives at `examples/plans/demo_scene.json`.
 
 ## Project layout
 

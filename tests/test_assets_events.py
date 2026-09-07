@@ -13,7 +13,7 @@ from physics_through_anim.physics.mechanics.contact import (
     Contact,
     ContactLifecycle,
 )
-from physics_through_anim.physics.mechanics.kinds import ForceKind
+from physics_through_anim.physics.mechanics.kinds import ForceKind, RelationKind
 
 
 def test_add_relation_stores_contacts_and_constraints_separately() -> None:
@@ -23,6 +23,18 @@ def test_add_relation_stores_contacts_and_constraints_separately() -> None:
     assert len(a.contacts) == 1
     assert len(a.constraints) == 1
     assert "pin" in a.constraints_by_name
+
+
+def test_relations_registry_is_typed_and_queryable() -> None:
+    a = Assembly()
+    a.add_relation(Contact(body="block1", surface="block2"))
+    a.add_relation(PinConstraint(participants=("rod", "wall")), name="pin")
+    touch = a.relations_of(RelationKind.TOUCH)
+    assert touch == [a.relations[0]]
+    assert touch[0].participants == ("block1", "block2")
+    assert a.relations_of(RelationKind.PIN)[0].participants == ("rod", "wall")
+    assert a.relations_with("rod")[0].kind is RelationKind.PIN
+    assert a.relations_between("block1", "block2")[0].kind is RelationKind.TOUCH
 
 
 def test_constraint_toggles_off_at_a_release_event() -> None:

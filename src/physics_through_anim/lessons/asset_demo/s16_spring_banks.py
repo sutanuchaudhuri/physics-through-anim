@@ -8,6 +8,8 @@ solve. Note how little code composes each bank.
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 from manim import DOWN, UP, WHITE, FadeIn, MathTex, Text
 
 from physics_through_anim.lessons.asset_demo.common import AssetDemoScene
@@ -17,6 +19,16 @@ from physics_through_anim.physics.mechanics import (
     series_springs,
 )
 from physics_through_anim.physics.mechanics.palette import COLOR_SPRING
+from physics_through_anim.physics.render.layout import NamedPoints
+
+
+class End(StrEnum):
+    """Named spring-bank endpoints -- referenced by id, never by raw tuple."""
+
+    SERIES_L = "series_L"
+    SERIES_R = "series_R"
+    PARALLEL_L = "parallel_L"
+    PARALLEL_R = "parallel_R"
 
 
 class SpringBanks(AssetDemoScene):
@@ -27,14 +39,20 @@ class SpringBanks(AssetDemoScene):
         header = self.scene_header("16", "Series & parallel springs", "one helper each")
         self.play(FadeIn(header))
 
+        # Define the connection points once, by id; reference them everywhere.
+        pts = NamedPoints().define(
+            series_L=(-4.5, 1.2), series_R=(1.5, 1.2),
+            parallel_L=(-4.5, -1.4), parallel_R=(-0.5, -1.4),
+        )
+
         series = series_springs(
             [LinearSpring(k=4.0, coils=6), LinearSpring(k=4.0, coils=6),
              LinearSpring(k=4.0, coils=6)],
-            from_point=(-4.5, 1.2), to_point=(1.5, 1.2),
+            from_point=pts[End.SERIES_L], to_point=pts[End.SERIES_R],
         )
         parallel = parallel_springs(
             [LinearSpring(k=3.0, coils=8), LinearSpring(k=5.0, coils=8)],
-            from_point=(-4.5, -1.4), to_point=(-0.5, -1.4), offset=0.5,
+            from_point=pts[End.PARALLEL_L], to_point=pts[End.PARALLEL_R], offset=0.5,
         )
 
         s_label = Text("series: coils end-to-end, junction connectors",

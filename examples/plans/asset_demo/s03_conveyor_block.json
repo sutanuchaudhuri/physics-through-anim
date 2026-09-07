@@ -1,0 +1,16 @@
+{
+  "problem": {"problem_id": "S03", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "conveyor", "name": "belt", "params": {"y": -1.6, "half_width": 4.0, "belt_speed": 0.0}},
+    {"kind": "block", "name": "m", "params": {"position": [0.0, -1.3], "width": 1.0, "label": "m"}, "place": {"on": "belt"}, "label": {"show": false}}
+  ],
+  "vectors": [
+    {"anchor": "m.CM", "vector": [0.0, -1.0], "role": "weight", "label": "mg", "placement": "right"},
+    {"anchor": "m.contact", "vector": [0.0, 1.0], "role": "normal", "label": "N", "placement": "top_right"},
+    {"anchor": "m.contact", "vector": [0.9, 0.0], "role": "friction", "label": "f", "placement": "bottom_right"}
+  ],
+  "markers": [
+    {"at": "m.contact", "label": "contact point", "color": "#ff4444", "placement": "bottom"},
+    {"at": "m.CM", "label": "CM", "color": "#ff4444", "placement": "top_left"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "problem": {"problem_id": "S27", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "f1", "params": {"y": 1.4, "half_width": 1.2}},
+    {"kind": "block", "name": "block", "params": {"position": [-3.5, 1.75], "width": 0.7, "label": "block/floor"}},
+    {"kind": "incline", "name": "ramp", "params": {"angle_deg": 25.0, "length": 1.6, "base": [-0.6, 1.2]}},
+    {"kind": "disk", "name": "disk", "params": {"position": [0.2, 1.9], "radius": 0.35, "label": "disk/incline"}},
+    {"kind": "ceiling", "name": "c1", "params": {"y": 0.6, "half_width": 1.2}},
+    {"kind": "pulley", "name": "pulley", "params": {"center": [3.2, 0.2], "radius": 0.3}},
+    {"kind": "rod", "name": "pend", "params": {"length": 1.2, "center": [-3.0, -1.4], "angle_deg": 70.0}},
+    {"kind": "cylinder", "name": "edge_cyl", "params": {"position": [0.0, -1.2], "radius": 0.35, "label": "table edge"}}
+  ],
+  "markers": [
+    {"point": [-3.5, 2.4], "label": "recipe gallery (static families)", "color": "#ffd43b"}
+  ]
+}

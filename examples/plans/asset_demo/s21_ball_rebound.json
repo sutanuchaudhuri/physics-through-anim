@@ -1,0 +1,19 @@
+{
+  "problem": {"problem_id": "S21", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.4, "half_width": 5.0}},
+    {"kind": "incline", "name": "ramp", "params": {"angle_deg": 25.0, "length": 5.5, "base": [-3.0, -2.4]}},
+    {"kind": "disk", "name": "ball", "params": {"position": [0.4, 0.2], "radius": 0.4, "label": "e"}}
+  ],
+  "vectors": [
+    {"anchor": "ball.CM", "vector": [1.2, -1.2], "role": "velocity", "label": "v_in"},
+    {"anchor": "ball.CM", "vector": [-0.42, 0.88], "role": "normal", "label": "n"},
+    {"anchor": "ball.CM", "vector": [1.2, 0.86], "role": "acceleration", "label": "v_out"}
+  ],
+  "paths": [
+    {"points": [[-2.0, 1.6], [-0.8, 0.7], [0.4, 0.2], [1.4, 0.9], [2.4, 0.8], [3.2, -0.4]], "color": "#ffd43b", "label": "incident -> rebound"}
+  ],
+  "markers": [
+    {"point": [0.4, 0.2], "label": "impact", "color": "#ff4444"}
+  ]
+}

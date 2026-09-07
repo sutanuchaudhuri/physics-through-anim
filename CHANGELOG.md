@@ -293,17 +293,45 @@ All notable changes to this project are documented here. The format is based on
   Sun at a focus — gravity always points at the Sun, the radius vector sweeps, an
   r-vs-t graph tracks, and two focus sectors swept in equal time have equal area.
   Specs in `tests/test_m13_orbital.py`.
-- Milestone **M13** — orbital / central-force. `orbital.py` (geometry only):
-  `CentralBody` (the force centre) and `OrbitPath` (an ellipse with one **focus**
-  at `focus`, `point_at(theta)`, apsis/foci keypoints), plus the solver-free
-  analytic provider `KeplerEllipseTrajectory` (equal-areas timing via Kepler's
-  equation) and declarative directions `toward`/`away_from`. New
-  `overlays/orbit.py`: `radius_vector`, `swept_area` (Kepler-II sector),
-  `central_force_arrow`. New `ForceKind.GRAVITY` + `COLOR_GRAVITY`/`COLOR_ORBIT`.
-  Flagship scene **s25** (`KeplerOrbit`, probe B): a planet on an ellipse with the
-  Sun at a focus — gravity always points at the Sun, the radius vector sweeps, an
-  r-vs-t graph tracks, and two focus sectors swept in equal time have equal area.
-  Specs in `tests/test_m13_orbital.py`.
+- Milestone **M14** — reference frames / non-inertial overlays. `reference_frames.py`:
+  `FrameKind` (INERTIAL/TRANSLATING/ROTATING), a supplied `FrameState` (never
+  integrated), and `ReferenceFrame` whose `to_frame` is a pure kinematic map on
+  `core.frames.Frame2D` (+ `is_inertial`, an observer `icon`). `overlays/frames.py`:
+  `pseudo_force_arrow` (dashed, neutral-grey `COLOR_PSEUDO` — inertial/centrifugal/
+  coriolis/euler directions from the frame state) and `frame_badge`, kept a
+  separate semantic class from real forces. Flagship scene **s26**
+  (`AcceleratingTruck`): a block in an accelerating truck shown in two frames —
+  the ground frame (real N/mg/f) and the truck frame (add the dashed `-m a_f`).
+  Specs in `tests/test_m14_frames.py`.
+- Milestone **M15** — recipe catalogue + regression gallery. `recipes/`: a
+  spec-only `Recipe` (assembly + events + overlays + trajectories + named
+  moments/camera anchors; `named()` resolves any of them) and a `catalogue.py` of
+  textbook compositions built only from generic assets — the four probes
+  (`kepler_orbit`, `cylinder_at_table_edge`, `chain_over_edge`, `galperin`) plus
+  `atwood`, `mass_spring`, and a **`FAMILIES`** registry of 20 representatives
+  (translation … com). The 20-family regression sweep (construct-without-error) is
+  the framework's best health check. Flagship scene **s27** (`RecipeGallery`): a
+  grid of recipe thumbnails, each a one-call composition. Specs in
+  `tests/test_m15_recipes.py`.
+- **Declarative layout anchors.** `render/layout.py` adds an `Anchor` enum
+  (`CENTER`, `TOP_LEFT`, `BOTTOM`, …), `Region.anchor(where, offset=…, pad=…)`,
+  `Region.columns(n, gap)`/`rows(n, gap)`, and `stage_region()` — so scenes place
+  content by **named anchors and panels** (e.g. `left, right = stage_region()
+  .columns(2)`; `title.move_to(left.anchor(Anchor.BOTTOM))`) instead of eyeballed
+  coordinates; a numeric `offset` is the escape hatch. Scene s26 refactored to
+  use it. Specs in `tests/test_layout_anchors.py`.
+- **Named points + semantic value tokens** (authoring ergonomics, replace magic
+  numbers). `render/layout.py` adds `NamedPoints` — a registry to define points by
+  **id/enum** and read coordinates, `vector`, and translation `distance` by id
+  (`pts.define(A=(-4.5,1.2), B=(1.5,1.2)); pts.distance("A","B")`; `StrEnum` keys
+  work). `render/tokens.py` adds mix-in enums that **are** their value so they drop
+  in wherever a number was written, with a raw number still allowed as the custom
+  escape hatch: `Size` (body extent), `Span` (support half-width), `Beat` (play
+  durations), `Dir` (unit-vector tangents/normals). Scenes s16/s27 use anchors +
+  named points; s03 uses the tokens (`Block(width=Size.LARGE)`,
+  `Floor(half_width=Span.WIDE)`, `ContactFrame(tangent=Dir.RIGHT, normal=Dir.UP)`,
+  `run_time=Beat.QUICK`). Specs in `tests/test_layout_anchors.py`,
+  `tests/test_tokens.py`.
 
 ### Known limitations (revisit as milestones land)
 

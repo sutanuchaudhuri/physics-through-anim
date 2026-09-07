@@ -15,8 +15,8 @@ import numpy as np
 from manim import Arc, ArcBetweenPoints, Circle, Dot, Line, VGroup, VMobject
 
 from physics_through_anim.physics.core.pose import Vec2
-from physics_through_anim.physics.mechanics.base import PhysicsAsset, _as_point
-from physics_through_anim.physics.mechanics.kinds import BodyDynamics, ForceKind
+from physics_through_anim.physics.mechanics.base import PhysicsAsset, Ref, _as_point
+from physics_through_anim.physics.mechanics.kinds import BodyDynamics, ForceKind, Keypoint
 from physics_through_anim.physics.mechanics.palette import COLOR_REACTION, COLOR_TENSION
 
 
@@ -26,8 +26,8 @@ class Connector(PhysicsAsset):
 
     name: str = "connector"
     dynamics: BodyDynamics = BodyDynamics.STATIC
-    from_ref: str = ""
-    to_ref: str = ""
+    from_ref: str | Ref = ""
+    to_ref: str | Ref = ""
 
 
 @dataclass
@@ -102,8 +102,13 @@ class Rope(Connector):
         self.mobject.remove(*self.mobject.submobjects)
         self.mobject.add(*rebuilt.submobjects)
 
-    def tension_on(self, body, at: str, toward) -> None:
-        """Declare a ``TENSION`` force on ``body`` at keypoint ``at`` toward a point."""
+    def tension_on(self, body, at: Keypoint | str, toward) -> None:
+        """Declare a ``TENSION`` force on ``body`` at keypoint ``at`` toward a point.
+
+        ``at`` is a body attach point -- pass a ``Keypoint`` member (``Keypoint.TOP``).
+        ``toward`` is the world point the rope pulls to; pass the result of a getter
+        such as ``assembly.resolve("pulley.left")``, not a bare string.
+        """
         anchor = body.keypoint(at)
         d = _as_point(toward) - anchor
         norm = float(np.linalg.norm(d)) or 1.0
@@ -241,8 +246,8 @@ class RopeOverPulley(Connector):
         self.mobject.remove(*self.mobject.submobjects)
         self.mobject.add(*rebuilt.submobjects)
 
-    def tension_on(self, body, at: str, toward) -> None:
-        """Declare a ``TENSION`` force on ``body`` at ``at`` toward a point."""
+    def tension_on(self, body, at: Keypoint | str, toward) -> None:
+        """Declare a ``TENSION`` force on ``body`` at ``at`` (a ``Keypoint``) toward a point."""
         anchor = body.keypoint(at)
         d = _as_point(toward) - anchor
         norm = float(np.linalg.norm(d)) or 1.0

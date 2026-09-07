@@ -1,0 +1,22 @@
+{
+  "problem": {"problem_id": "S12", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.4, "half_width": 5.0}},
+    {"kind": "hinge", "name": "hold", "params": {"at": [-1.0, 1.4]}},
+    {"kind": "block", "name": "m", "params": {"position": [-1.0, 1.0], "width": 0.8, "label": "m"}},
+    {"kind": "block", "name": "m_fall", "params": {"position": [-1.0, -1.9], "width": 0.8, "color": "#868e96", "show_weight": false, "show_cm": false}, "style": {"display": "dotted"}}
+  ],
+  "relations": [
+    {"kind": "pin", "participants": ["m", "hold"], "params": {"at": "hold.H", "name": "hold"}}
+  ],
+  "paths": [
+    {"points": [[-1.0, 1.0], [-1.0, -1.9]], "color": "#ffd43b", "label": "free fall"}
+  ],
+  "vectors": [
+    {"anchor": "m.CM", "vector": [0.0, -1.0], "role": "weight", "label": "mg"}
+  ],
+  "steps": [
+    {"kind": "initialize", "at": 0.0, "label": "held by the hinge"},
+    {"kind": "scene_change", "at": 1.0, "label": "released", "params": {"deactivate": ["hold"]}}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "problem": {"problem_id": "S04", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.0, "half_width": 5.0}},
+    {"kind": "disk", "name": "rock", "params": {"position": [0.0, -1.4], "radius": 0.6, "color": "#b08968", "label": "rock"}}
+  ],
+  "vectors": [
+    {"anchor": "rock.CM", "vector": [1.4, 0.0], "role": "velocity", "label": "v_cm"},
+    {"anchor": "rock.top", "vector": [2.0, 0.0], "role": "velocity", "label": "2v"}
+  ],
+  "paths": [
+    {"points": [[-1.4, -2.0], [1.4, -2.0]], "color": "#495057", "label": "path"}
+  ],
+  "markers": [
+    {"at": "rock.bottom", "label": "P (contact)", "color": "#ff4444", "placement": "bottom"},
+    {"at": "rock.top", "label": "top", "color": "#ff4444", "placement": "top"},
+    {"at": "rock.CM", "label": "CM", "color": "#ff4444", "placement": "left"}
+  ]
+}

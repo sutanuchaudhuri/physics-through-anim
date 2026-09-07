@@ -1,0 +1,17 @@
+{
+  "problem": {"problem_id": "DEMO-001", "source_id": "demo"},
+  "entities": [
+    {"kind": "ceiling", "name": "ceiling", "params": {"y": 3.2, "half_width": 4.5}},
+    {"kind": "block", "name": "m_1", "params": {"position": [-0.5, 0.4], "width": 0.8}},
+    {"kind": "disk", "name": "d", "params": {"position": [1.5, 0.5], "radius": 0.5}},
+    {"kind": "rope", "name": "rope_a", "params": {"from_ref": "ceiling.start", "to_ref": "m_1.top"}}
+  ],
+  "relations": [
+    {"kind": "rolling", "participants": ["d", "ceiling"], "params": {"radius": 0.5, "name": "roll"}}
+  ],
+  "steps": [
+    {"kind": "initialize", "at": 0.0, "label": "seat bodies"},
+    {"kind": "timestep", "at": 0.0, "dt": 0.5, "label": "advance"},
+    {"kind": "scene_change", "at": 2.0, "label": "release", "params": {"deactivate": ["roll"]}}
+  ]
+}

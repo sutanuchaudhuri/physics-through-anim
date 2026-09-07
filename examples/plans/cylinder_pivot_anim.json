@@ -1,0 +1,18 @@
+{
+  "problem": {"problem_id": "PIVOT-ANIM", "source_id": "demo"},
+  "entities": [
+    {"kind": "table", "name": "table", "params": {"top_y": 0.0, "left": -3.0, "right": 3.0, "color": "#9aa4b2"}, "style": {"fill": "hashed"}},
+    {"kind": "edge", "name": "corner", "params": {"at": [3.0, 0.0]}},
+    {"kind": "cylinder", "name": "cyl", "params": {"position": [3.0, 0.6], "radius": 0.6, "color": "#74c0fc"}}
+  ],
+  "markers": [
+    {"at": "corner.E", "label": "pivot (hinge)", "color": "#ff4444"}
+  ],
+  "steps": [
+    {"kind": "initialize", "at": 0.0, "label": "cylinder rests on the corner"},
+    {"kind": "timestep", "at": 0.0, "dt": 1.5, "label": "rotate about the hinge",
+     "transforms": [{"target": "cyl", "rotate_deg": -80.0, "about": "corner.E"}]},
+    {"kind": "timestep", "at": 1.5, "dt": 1.0, "label": "loses contact -> free fall",
+     "transforms": [{"target": "cyl", "translate": [0.6, -3.0]}]}
+  ]
+}

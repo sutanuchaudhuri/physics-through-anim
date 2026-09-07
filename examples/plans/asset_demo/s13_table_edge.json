@@ -1,0 +1,24 @@
+{
+  "problem": {"problem_id": "S13", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "table", "name": "table", "params": {"top_y": 0.0, "left": -3.0, "right": 1.0, "color": "#9aa4b2"}},
+    {"kind": "edge", "name": "corner", "params": {"at": [1.0, 0.0]}},
+    {"kind": "cylinder", "name": "cyl", "params": {"position": [0.4, 0.6], "radius": 0.6, "color": "#74c0fc", "label": "m"}, "place": {"on": "table"}, "label": {"show": false}}
+  ],
+  "relations": [
+    {"kind": "rolling", "participants": ["cyl", "table"], "params": {"radius": 0.6, "name": "roll"}}
+  ],
+  "vectors": [
+    {"anchor": "cyl.CM", "vector": [0.0, -1.0], "role": "weight", "label": "mg", "placement": "right"},
+    {"anchor": "cyl.contact", "vector": [0.0, 1.0], "role": "normal", "label": "N", "placement": "top_left"},
+    {"anchor": "cyl.contact", "vector": [0.9, 0.0], "role": "friction", "label": "f", "placement": "bottom_right"}
+  ],
+  "paths": [
+    {"points": [[1.0, 0.0], [1.4, -0.4], [1.8, -1.3], [2.1, -2.6]], "color": "#ffd43b", "label": "flight after edge"}
+  ],
+  "markers": [
+    {"at": "cyl.contact", "label": "contact point", "color": "#ff4444", "placement": "bottom_left"},
+    {"at": "cyl.CM", "label": "CM", "color": "#ff4444", "placement": "top_right"},
+    {"at": "corner.E", "label": "edge (contact switch)", "color": "#ffd43b", "placement": "right"}
+  ]
+}

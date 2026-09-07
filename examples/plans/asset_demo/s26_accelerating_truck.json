@@ -1,0 +1,17 @@
+{
+  "problem": {"problem_id": "S26", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "block", "name": "bed", "params": {"position": [0.0, -1.2], "width": 3.4, "height": 0.4, "color": "#adb5bd", "show_weight": false, "show_cm": false, "label": "truck"}},
+    {"kind": "block", "name": "m", "params": {"position": [0.0, -0.7], "width": 0.7, "height": 0.6, "label": "m"}}
+  ],
+  "vectors": [
+    {"anchor": "m.CM", "vector": [0.0, -1.0], "role": "weight", "label": "mg"},
+    {"anchor": "m.bottom", "vector": [0.0, 1.0], "role": "normal", "label": "N"},
+    {"anchor": "m.CM", "vector": [1.0, 0.0], "role": "friction", "label": "f (real)"},
+    {"anchor": "m.CM", "vector": [-1.2, 0.0], "role": "force", "label": "-ma (pseudo, S')"}
+  ],
+  "markers": [
+    {"point": [-2.4, 0.4], "label": "S' (accelerating frame)", "color": "#ff4444"},
+    {"point": [1.7, -1.9], "label": "a", "color": "#ffd43b"}
+  ]
+}

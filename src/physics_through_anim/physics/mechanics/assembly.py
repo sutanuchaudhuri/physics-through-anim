@@ -8,11 +8,13 @@ diagrams.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 from manim import VGroup
 
 from physics_through_anim.physics.core.events import EventSequence
-from physics_through_anim.physics.mechanics.base import PhysicsAsset
+from physics_through_anim.physics.mechanics.base import PhysicsAsset, Ref
 from physics_through_anim.physics.mechanics.contact import Contact
 from physics_through_anim.physics.mechanics.geometry import (
     TOUCH_TOL,
@@ -21,20 +23,51 @@ from physics_through_anim.physics.mechanics.geometry import (
     corner_seat,
     seat_circle_on_surface,
 )
+from physics_through_anim.physics.mechanics.kinds import RelationKind
 from physics_through_anim.physics.mechanics.supports import Floor, Wall
+
+# Which RelationKind a typed constraint dataclass maps to (by class name).
+_CONSTRAINT_KINDS: dict[str, RelationKind] = {
+    "PinConstraint": RelationKind.PIN,
+    "FixedPointConstraint": RelationKind.FIXED_POINT,
+    "DistanceConstraint": RelationKind.DISTANCE,
+    "RopeLengthConstraint": RelationKind.ROPE_LENGTH,
+    "RollingConstraint": RelationKind.ROLLING,
+    "PathConstraint": RelationKind.PATH,
+    "SlotConstraint": RelationKind.SLOT,
+    "FixedAxleConstraint": RelationKind.AXLE,
+    "ContactLockConstraint": RelationKind.CONTACT_LOCK,
+}
+
+
+@dataclass(frozen=True)
+class Relation:
+    """A typed relationship between named assets, queryable on an ``Assembly``.
+
+    ``participants`` are member asset names in a kind-defined order -- e.g.
+    ``HANG -> (hung, support)``, ``ROPE -> (from, to)``, ``TOUCH -> (body, surface)``.
+    Recorded automatically by ``hang``/``connect``/``add_relation``.
+    """
+
+    kind: RelationKind
+    participants: tuple[str, ...]
+    name: str | None = None
+
 
 
 class Assembly:
     """A named collection of placed assets."""
 
-    def __init__(self, *, contact_tol: float = TOUCH_TOL) -> None:
+    def __init__(self, *, contact_tol: float = TOUCH_TOL, check_penetration: bool = True) -> None:
         self.members: list[PhysicsAsset] = []
         self.mobject = VGroup()
         self.keypoints: dict[str, np.ndarray] = {}
         # bodies within this band of a wall are touching, not piercing:
         self.contact_tol = contact_tol
+        self.check_penetration = check_penetration
         self.contacts: list[Contact] = []
         self.constraints_by_name: dict[str, object] = {}
+        self.relations: list[Relation] = []
         self.timeline = EventSequence()
 
     def add(self, asset: PhysicsAsset, place_on: PhysicsAsset | None = None) -> PhysicsAsset:
@@ -60,6 +93,9 @@ class Assembly:
             return
         if isinstance(support, Wall):
             self._seat_on_wall(body, support)
+            return
+        if hasattr(support, "top_y") and hasattr(support, "top_surface"):  # a Table top
+            self._seat_on_floor(body, Floor(y=float(support.top_y)))
             return
         raise NotImplementedError(f"cannot place a body on '{type(support).__name__}'.")
 
@@ -106,6 +142,8 @@ class Assembly:
 
     def _assert_no_penetration(self) -> None:
         """No dynamic body may cross to a wall's solid side, beyond the contact band."""
+        if not self.check_penetration:
+            return
         walls = [m for m in self.members if isinstance(m, Wall)]
         for body in self.members:
             if isinstance(body, Wall) or "CM" not in getattr(body, "keypoints", {}):
@@ -124,9 +162,13 @@ class Assembly:
             raise KeyError(f"Unknown keypoint '{key}'. Known: {list(self.keypoints)}")
         return self.keypoints[key]
 
-    def resolve(self, ref: str) -> np.ndarray:
-        """Resolve a namespaced keypoint ref (e.g. ``'pulley.A'``) to a world point."""
-        return self.keypoint(ref)
+    def resolve(self, ref: str | Ref) -> np.ndarray:
+        """Resolve a keypoint ref to a world point.
+
+        Accepts a typed ``Ref`` from ``asset.port(key)`` or the equivalent
+        namespaced string (e.g. ``'pulley.left'``).
+        """
+        return self.keypoint(str(ref))
 
     def body(self, name: str) -> PhysicsAsset:
         """The member asset named ``name`` (semantic query)."""
@@ -146,13 +188,39 @@ class Assembly:
     # --- relations + event timeline (M7) ---------------------------------
 
     def add_relation(self, relation, *, name: str | None = None):
-        """Store a ``Contact`` or a typed constraint (relations, not drawables)."""
+        """Store a ``Contact`` or a typed constraint (relations, not drawables).
+
+        Also records a typed ``Relation`` in ``self.relations`` so the topology is
+        queryable via ``relations_of``/``relations_with``/``relations_between``.
+        """
         if isinstance(relation, Contact):
             self.contacts.append(relation)
+            self.record_relation(RelationKind.TOUCH, (relation.body, relation.surface))
         else:
             key = name or f"constraint_{len(self.constraints_by_name)}"
             self.constraints_by_name[key] = relation
+            kind = _CONSTRAINT_KINDS.get(type(relation).__name__, RelationKind.CONSTRAINT)
+            self.record_relation(kind, tuple(getattr(relation, "participants", ())), name=key)
         return relation
+
+    def record_relation(self, kind: RelationKind, participants: tuple[str, ...],
+                        *, name: str | None = None) -> Relation:
+        """Append a typed ``Relation`` between named assets and return it."""
+        rel = Relation(kind=kind, participants=participants, name=name)
+        self.relations.append(rel)
+        return rel
+
+    def relations_of(self, kind: RelationKind) -> list[Relation]:
+        """Every recorded relation of a given ``kind``."""
+        return [r for r in self.relations if r.kind == kind]
+
+    def relations_with(self, asset: str) -> list[Relation]:
+        """Every relation that names ``asset`` as a participant."""
+        return [r for r in self.relations if asset in r.participants]
+
+    def relations_between(self, a: str, b: str) -> list[Relation]:
+        """Every relation whose participants include both ``a`` and ``b``."""
+        return [r for r in self.relations if a in r.participants and b in r.participants]
 
     @property
     def constraints(self) -> list:
@@ -200,10 +268,17 @@ class Assembly:
         self.mobject.clear_updaters()
 
     def connect(self, connector) -> PhysicsAsset:
-        """Resolve a connector's ``from_ref``/``to_ref`` to world points and add it."""
-        a = self.resolve(connector.from_ref)
-        b = self.resolve(connector.to_ref)
+        """Resolve a connector's ``from_ref``/``to_ref`` to world points and add it.
+
+        Records a ``ROPE`` relation between the two endpoint assets (the part of
+        each ref before the ``.``).
+        """
+        a = self.resolve(str(connector.from_ref))
+        b = self.resolve(str(connector.to_ref))
         connector.set_endpoints(a, b)
+        from_asset = str(connector.from_ref).split(".", 1)[0]
+        to_asset = str(connector.to_ref).split(".", 1)[0]
+        self.record_relation(RelationKind.ROPE, (from_asset, to_asset), name=connector.name)
         return self.add(connector)
 
     def hang(self, pulley, from_ceiling, *, drop: float = 0.8) -> PhysicsAsset:
@@ -211,6 +286,7 @@ class Assembly:
         anchor = from_ceiling.anchor(pulley.keypoint("axle")[0])
         target = anchor - np.array([0.0, drop, 0.0])
         pulley.shift(target - pulley.keypoint("axle"))
+        self.record_relation(RelationKind.HANG, (pulley.name, from_ceiling.name))
         return self.add(pulley)
 
     def fbd(self, include=None) -> VGroup:

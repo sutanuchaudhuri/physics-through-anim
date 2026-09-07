@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from physics_through_anim.physics.problems.adapters import plan_to_recipe
 from physics_through_anim.physics.problems.refs import ProblemRef
 from physics_through_anim.physics.problems.scene_plan import (
@@ -11,8 +9,6 @@ from physics_through_anim.physics.problems.scene_plan import (
     ProblemScenePlan,
     RelationSpec,
 )
-
-TDD = pytest.mark.xfail(reason="M17 not implemented (TDD spec)", strict=False)
 
 
 def test_problem_ref_and_plan_are_typed() -> None:
@@ -27,6 +23,16 @@ def test_problem_ref_and_plan_are_typed() -> None:
     assert plan.entities[0].params["radius"] == 0.5
 
 
-@TDD
-def test_plan_to_recipe() -> None:
-    plan_to_recipe(ProblemScenePlan())
+def test_plan_to_recipe_builds_an_assembly() -> None:
+    plan = ProblemScenePlan(
+        entities=[
+            EntitySpec(kind="disk", name="d", params={"radius": 0.5}),
+            EntitySpec(kind="incline", name="incline", params={"angle_deg": 30.0}),
+        ],
+        relations=[RelationSpec(kind="rolling", participants=("d", "incline"),
+                                params={"radius": 0.5, "name": "roll"})],
+    )
+    recipe = plan_to_recipe(plan)
+    names = [m.name for m in recipe.assembly.members]
+    assert names == ["d", "incline"]
+    assert recipe.assembly.constraints_by_name["roll"].participants == ("d", "incline")

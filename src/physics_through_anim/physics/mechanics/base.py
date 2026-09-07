@@ -14,7 +14,7 @@ from dataclasses import dataclass, field
 import numpy as np
 from manim import VGroup
 
-from physics_through_anim.physics.mechanics.kinds import BodyDynamics, ForceKind
+from physics_through_anim.physics.mechanics.kinds import BodyDynamics, ForceKind, Keypoint
 
 
 @dataclass(frozen=True)
@@ -22,7 +22,7 @@ class ForceSpec:
     """One declared force, drawn at a named keypoint by the FBD layer."""
 
     kind: ForceKind
-    at: str  # keypoint name on the owning asset ("CM", "P", "A"...)
+    at: Keypoint | str  # keypoint name on the owning asset (Keypoint.CM, "P", "A"...)
     label: str  # symbolic only, e.g. "mg", "N", "f_s", "T_A" (SKILL Rule 9)
     direction: tuple[float, float] | str = "auto"  # unit vector or keyword
     magnitude: float | None = None  # for relative arrow lengths; None = default
@@ -34,6 +34,23 @@ def _as_point(value) -> np.ndarray:
     if arr.shape == (2,):
         return np.array([arr[0], arr[1], 0.0])
     return arr
+
+
+@dataclass(frozen=True)
+class Ref:
+    """A typed assembly keypoint reference (``asset.key``).
+
+    Built by ``asset.port(key)`` so call sites never hand-concatenate the
+    namespaced string; ``str(ref)`` is exactly the ``"asset.key"`` that
+    ``Assembly.resolve`` looks up, so a raw string is still accepted anywhere a
+    ``Ref`` is.
+    """
+
+    asset: str
+    key: str
+
+    def __str__(self) -> str:
+        return f"{self.asset}.{self.key}"
 
 
 @dataclass
@@ -59,15 +76,21 @@ class PhysicsAsset:
     def set_keypoint(self, key: str, point) -> None:
         self.keypoints[key] = _as_point(point)
 
-    def keypoint(self, key: str) -> np.ndarray:
+    def keypoint(self, key: Keypoint | str) -> np.ndarray:
         if key not in self.keypoints:
             raise KeyError(f"'{self.name}' has no keypoint '{key}'. Known: {list(self.keypoints)}")
         return self.keypoints[key]
 
+    def port(self, key: Keypoint | str) -> Ref:
+        """A typed assembly ref to one of this asset's keypoints (``self.name.key``)."""
+        if str(key) not in self.keypoints:
+            raise KeyError(f"'{self.name}' has no keypoint '{key}'. Known: {list(self.keypoints)}")
+        return Ref(self.name, str(key))
+
     def add_force(
         self,
         kind: ForceKind,
-        at: str,
+        at: Keypoint | str,
         label: str,
         direction: tuple[float, float] | str = "auto",
         magnitude: float | None = None,

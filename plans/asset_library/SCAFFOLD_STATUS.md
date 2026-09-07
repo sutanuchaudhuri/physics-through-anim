@@ -5,11 +5,11 @@ modules under `src/physics_through_anim/physics/` and an executable spec under
 `tests/`. Behavioural specs are `xfail` (RED until implemented) so the shipped
 suite stays **green**; structural specs pass now and guard the public shape.
 
-Current state: **245 passed, 5 xfailed** (`uv run pytest -q`). M1, M1.5, M1.6, M2,
-M3, M4, M5, M6, M7, M8, M9, M10, M11, M12 and M13 are implemented; M14 onward are
-scaffolds awaiting implementation. Design lives in each milestone's plan doc;
-namespace/layering in [ARCHITECTURE.md](ARCHITECTURE.md); Jira project **PAC**
-tracks status.
+Current state: **303 passed, 2 xfailed** (`uv run pytest -q`). M1, M1.5, M1.6, M2,
+M3, M4, M5, M6, M7, M8, M9, M10, M11, M12, M13, M14, M15 and M17 (spec-driven
+serialization) are implemented; M16 and M18 remain scaffolds awaiting
+implementation. Design lives in each milestone's plan doc; namespace/layering in
+[ARCHITECTURE.md](ARCHITECTURE.md); Jira project **PAC** tracks status.
 
 ## What is done, per milestone
 
@@ -30,10 +30,10 @@ tracks status.
 | **M11** | `mechanics/chain` (DistributedBody: Chain/ElasticString/MassiveSpring/FlexibleRod) | `test_m11_chain.py` | **DONE** |
 | **M12** | `core/impact` + `overlays/events` (PiecewiseTrajectory/EventCounter/collision) | `test_m12_collisions.py` | **DONE** |
 | **M13** | `mechanics/orbital` | `test_m13_orbital.py` | scaffold |
-| **M14** | `mechanics/reference_frames` | `test_m14_frames.py` | scaffold |
+| **M14** | `mechanics/reference_frames` + `overlays/frames` (pseudo-forces) | `test_m14_frames.py` | **DONE** |
 | **M15** | `recipes/base` | `test_m15_recipes.py` | scaffold |
 | **M16** | `mechanics3d/bodies3d` | `test_m16_threed.py` | scaffold |
-| **M17** | `problems/{refs,scene_plan,adapters}` | `test_m17_problems.py` | scaffold |
+| **M17** | `problems/{refs,scene_plan,adapters}` + `serialization/{codec,assets,assembly_io}` | `test_m17_problems.py`, `test_serialization.py` | **DONE** (spec ⇄ JSON/XML ⇄ Assembly) |
 | **M18** | `core/scene_data`, `overlays/views` | `test_m18_presentation.py` | scaffold |
 
 Each scaffold module: pure-data declarations (dataclasses, `StrEnum`s, defaults)
@@ -50,7 +50,7 @@ Out of scope here: fluids **F1–F6** (sibling domain) — scaffold separately.
 
 ```bash
 # Whole suite — stays green (structural passes + xfail specs):
-uv run pytest -q                         # -> 245 passed, 5 xfailed
+uv run pytest -q                         # -> 277 passed, 3 xfailed
 uv run ruff check .                      # scaffold is lint-clean
 
 # One milestone's specs, forced to run for real (the TDD "red"):

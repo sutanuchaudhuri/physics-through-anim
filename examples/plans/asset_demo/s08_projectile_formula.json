@@ -1,0 +1,26 @@
+{
+  "problem": {"problem_id": "S08", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "floor", "name": "floor", "params": {"y": -2.0, "half_width": 5.0}},
+    {"kind": "disk", "name": "ball", "params": {"position": [-4.0, -2.0], "radius": 0.22, "color": "#ffd43b", "label": "m"}, "label": {"show": false}}
+  ],
+  "paths": [
+    {"points": [[-4.0, -2.0], [4.0, -2.0]], "color": "#ffd43b", "kind": "parabola", "height": 3.4, "samples": 28}
+  ],
+  "vectors": [
+    {"anchor": "ball.CM", "vector": [1.6, 1.9], "role": "velocity", "label": "v0", "placement": "left"}
+  ],
+  "steps": [
+    {"kind": "timestep", "at": 1.0, "dt": 0.2, "transforms": [{"target": "ball", "translate": [1.333, 1.889]}]},
+    {"kind": "timestep", "at": 2.0, "dt": 0.2, "transforms": [{"target": "ball", "translate": [1.333, 1.133]}]},
+    {"kind": "timestep", "at": 3.0, "dt": 0.2, "transforms": [{"target": "ball", "translate": [1.333, 0.378]}]},
+    {"kind": "timestep", "at": 4.0, "dt": 0.2, "transforms": [{"target": "ball", "translate": [1.333, -0.378]}]},
+    {"kind": "timestep", "at": 5.0, "dt": 0.2, "transforms": [{"target": "ball", "translate": [1.333, -1.133]}]},
+    {"kind": "timestep", "at": 6.0, "dt": 0.2, "transforms": [{"target": "ball", "translate": [1.333, -1.889]}]}
+  ],
+  "markers": [
+    {"point": [0.0, 1.4], "label": "apex (v_y=0)", "color": "#ff4444", "placement": "top"},
+    {"point": [-4.0, -2.0], "label": "t=0", "color": "#ffd43b", "placement": "bottom_left"},
+    {"point": [-3.5, 1.7], "label": "ghosts every dt=0.2 s (equal time steps)", "color": "#adb5bd", "placement": "right"}
+  ]
+}

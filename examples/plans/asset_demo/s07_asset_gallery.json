@@ -1,0 +1,14 @@
+{
+  "problem": {"problem_id": "S07", "source_id": "asset_demo"},
+  "entities": [
+    {"kind": "block", "name": "block", "params": {"position": [-5.0, 0.0], "width": 1.0, "label": "block"}},
+    {"kind": "disk", "name": "disk", "params": {"position": [-3.4, 0.0], "radius": 0.5, "label": "disk"}},
+    {"kind": "ring", "name": "ring", "params": {"position": [-2.0, 0.0], "radius": 0.5, "label": "ring"}},
+    {"kind": "cylinder", "name": "cyl", "params": {"position": [-0.6, 0.0], "radius": 0.5, "label": "cyl"}},
+    {"kind": "rod", "name": "rod", "params": {"length": 1.2, "center": [1.0, 0.0]}},
+    {"kind": "incline", "name": "ramp", "params": {"angle_deg": 28.0, "length": 1.6, "base": [2.0, -0.8]}},
+    {"kind": "pulley", "name": "pulley", "params": {"center": [4.0, 0.6], "radius": 0.5}},
+    {"kind": "hinge", "name": "hinge", "params": {"at": [5.2, -0.6]}},
+    {"kind": "linear_spring", "name": "spring", "params": {"from_point": [-5.0, -1.9], "to_point": [-3.0, -1.9]}}
+  ]
+}
