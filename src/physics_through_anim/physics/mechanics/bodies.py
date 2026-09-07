@@ -84,3 +84,25 @@ class Block(PhysicsAsset):
 
 # The default rectangular mass is also exported under this clearer name.
 RectangularMass = Block
+
+
+@dataclass
+class Particle(PhysicsAsset):
+    """A point-like body: a dot at its CM (mass concentrated at a point)."""
+
+    name: str = "particle"
+    mass: float = 1.0
+    position: tuple[float, float] = (0.0, 0.0)
+    radius: float = 0.09
+    color: str | None = None
+    show_weight: bool = False
+    label: str | None = "m"
+
+    def build(self) -> VGroup:
+        cx, cy = self.position
+        dot = Dot([cx, cy, 0.0], color=self.color or YELLOW, radius=self.radius)
+        self.set_keypoint("CM", [cx, cy])
+        if self.show_weight:
+            self.add_force(ForceKind.WEIGHT, at="CM", label="mg", direction="down")
+        return VGroup(dot)
+

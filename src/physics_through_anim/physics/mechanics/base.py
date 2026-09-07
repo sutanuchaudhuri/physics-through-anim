@@ -46,6 +46,8 @@ class PhysicsAsset:
     keypoints: dict[str, np.ndarray] = field(default_factory=dict, init=False)
     forces: list[ForceSpec] = field(default_factory=list, init=False)
     mobject: VGroup = field(default_factory=VGroup, init=False)
+    _applied_angle: float = field(default=0.0, init=False)  # tracks apply_state rotation
+    _state: object = field(default=None, init=False)  # last applied kinematic state
 
     def __post_init__(self) -> None:
         self.mobject = self.build()
@@ -81,6 +83,36 @@ class PhysicsAsset:
         self.mobject.shift(vec)
         for key in self.keypoints:
             self.keypoints[key] = self.keypoints[key] + vec
+        return self
+
+    def rotate(self, angle: float, about=None) -> PhysicsAsset:
+        """Rotate the mobject and every keypoint by ``angle`` about a pivot (default CM)."""
+        pivot = _as_point(about) if about is not None else self.keypoints["CM"]
+        self.mobject.rotate(angle, about_point=pivot)
+        c, s = np.cos(angle), np.sin(angle)
+        for key, point in self.keypoints.items():
+            rel = point - pivot
+            self.keypoints[key] = pivot + np.array([c * rel[0] - s * rel[1],
+                                                    s * rel[0] + c * rel[1], 0.0])
+        return self
+
+    def apply_state(self, state) -> PhysicsAsset:
+        """Move the asset to a supplied kinematic ``state`` (absolute pose, no drift).
+
+        ``state`` is a ``RigidKinematicState`` (``.pose``) or an ``AssetState``
+        (``.body``). Rotation is tracked so repeated updater calls never accumulate.
+        """
+        pose = getattr(state, "pose", None)
+        if pose is None:
+            pose = getattr(getattr(state, "body", None), "pose", None)
+        if pose is None:
+            return self
+        self.rotate(pose.angle - self._applied_angle)
+        self._applied_angle = pose.angle
+        cm = self.keypoints["CM"]
+        target = np.array([pose.position[0], pose.position[1], 0.0])
+        self.shift(target - cm)
+        self._state = state
         return self
 
     def fbd(self, include=None) -> VGroup:

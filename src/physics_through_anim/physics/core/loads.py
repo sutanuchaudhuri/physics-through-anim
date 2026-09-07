@@ -90,9 +90,17 @@ def arrow_length(
     policy: VectorScalePolicy,
     *,
     base: float = 1.0,
+    clip: float = 3.0,
 ) -> float:
     """Arrow length for a load's ``value`` under ``policy``.
 
     ``FIXED`` returns ``base`` regardless of ``value`` (physics != length).
     """
-    raise NotImplementedError("M1.5 loads.arrow_length")
+    if policy is VectorScalePolicy.FIXED:
+        return base
+    magnitude = float(value) if isinstance(value, int | float) else 1.0
+    if policy is VectorScalePolicy.PROPORTIONAL:
+        return base * magnitude
+    if policy is VectorScalePolicy.CLIPPED:
+        return min(base * magnitude, base * clip)
+    return base  # NORMALIZED -> unit length

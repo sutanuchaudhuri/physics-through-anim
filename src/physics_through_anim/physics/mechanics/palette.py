@@ -19,6 +19,10 @@ COLOR_NORMAL = GREEN
 COLOR_WEIGHT = PURPLE
 COLOR_TENSION = "#0CA678"  # teal-green, distinct from the warm force hues
 COLOR_REACTION = "#868E96"  # neutral grey for hinge/pin reactions
+COLOR_SPRING = "#5C7CFA"  # indigo for elastic restoring force
+COLOR_DAMPING = "#9775FA"  # violet for dashpot damping force
+COLOR_GRAVITY = "#E64980"  # magenta-rose for central gravitation (distinct from mg weight)
+COLOR_ORBIT = "#4DABF7"  # sky blue for orbit paths
 
 # Kinematic family -- separate palette so a force and a velocity are never
 # visually confused (SKILL Rule 2).
@@ -33,4 +37,7 @@ FORCE_COLORS: dict[ForceKind, object] = {
     ForceKind.APPLIED: COLOR_APPLIED,
     ForceKind.TENSION: COLOR_TENSION,
     ForceKind.REACTION: COLOR_REACTION,
+    ForceKind.SPRING: COLOR_SPRING,
+    ForceKind.DAMPING: COLOR_DAMPING,
+    ForceKind.GRAVITY: COLOR_GRAVITY,
 }

@@ -5,29 +5,30 @@ modules under `src/physics_through_anim/physics/` and an executable spec under
 `tests/`. Behavioural specs are `xfail` (RED until implemented) so the shipped
 suite stays **green**; structural specs pass now and guard the public shape.
 
-Current state: **50 passed, 38 xfailed** (`uv run pytest -q`). M1 is shipped; M1.5
-onward are scaffolds awaiting implementation. Design lives in each milestone's
-plan doc; namespace/layering in [ARCHITECTURE.md](ARCHITECTURE.md); Jira project
-**PAC** tracks status.
+Current state: **245 passed, 5 xfailed** (`uv run pytest -q`). M1, M1.5, M1.6, M2,
+M3, M4, M5, M6, M7, M8, M9, M10, M11, M12 and M13 are implemented; M14 onward are
+scaffolds awaiting implementation. Design lives in each milestone's plan doc;
+namespace/layering in [ARCHITECTURE.md](ARCHITECTURE.md); Jira project **PAC**
+tracks status.
 
 ## What is done, per milestone
 
 | Milestone | Modules (`physics/…`) | Spec file (`tests/…`) | Status |
 | --- | --- | --- | --- |
 | **M1** | `mechanics/{kinds,palette,base,fbd,bodies,supports,assembly}` | `test_assets_mechanics.py` | **SHIPPED** (19 pass) |
-| **M1.5** | `core/{pose,refs,loads}`, `mechanics/{massprops,rigidbody}` | `test_m1_5_pose_rigidbody.py` | scaffold |
-| **M1.6** | `core/{transforms,frames,state}`, `kinematics/{rigid_body,rolling,bindings}` | `test_m1_6_kinematics.py` | scaffold |
-| **M2** | `mechanics/{surfaces,contact,environment}` | `test_m02_supports_contact.py` | scaffold |
-| **M3** | `mechanics/{circular,motion}` | `test_m03_rolling.py` | scaffold |
-| **M4** | `mechanics/{connectors,constraints}` | `test_m04_connectors.py` | scaffold |
-| **M5** | `mechanics/rod` | `test_m05_rod.py` | scaffold |
-| **M6** | `core/{trajectory,state}` | `test_m06_state_trajectory.py` | scaffold |
-| **M7** | `core/events` | `test_m07_events.py` | scaffold |
-| **M8** | `mechanics/surfaces_curved` | `test_m08_curved_surfaces.py` | scaffold |
-| **M9** | `overlays/{graphs,kinematics,forces}` | `test_m09_overlays.py` | scaffold |
-| **M10** | `mechanics/springs` | `test_m10_springs.py` | scaffold |
-| **M11** | `mechanics/chain` | `test_m11_chain.py` | scaffold |
-| **M12** | `core/impact`, `overlays/events` | `test_m12_collisions.py` | scaffold |
+| **M1.5** | `core/{pose,refs,loads}`, `mechanics/{massprops,rigidbody}` | `test_m1_5_pose_rigidbody.py` | **DONE** (18 pass) |
+| **M1.6** | `core/{transforms,frames,state}`, `kinematics/{rigid_body,rolling,instantaneous_center,point,bindings}` | `test_m1_6_kinematics.py`, `test_kinematics.py` | **DONE** (37 pass) |
+| **M2** | `mechanics/{surfaces,contact,environment,geometry}` + unified `supports.Wall` | `test_m02_supports_contact.py`, `test_m02_non_penetration.py` | **DONE** |
+| **M3** | `mechanics/{circular,motion}` + `render/skins.py` (rock/skin) | `test_m03_rolling.py`, `test_render_skins.py` | **DONE** |
+| **M4** | `mechanics/{connectors,constraints}` + `assembly` resolve/connect/hang | `test_m04_connectors.py` | **DONE** |
+| **M5** | `mechanics/rod` + `s07_asset_gallery` + SKILL Rule 19 | `test_m05_rod.py`, `test_assets_catalog.py` | **DONE** |
+| **M6** | `core/{trajectory,state}` + `apply_state`/`animate_trajectory` + `Particle` | `test_m06_state_trajectory.py`, `test_assets_state.py` | **DONE** |
+| **M7** | `core/events` + `assembly` relations/timeline + contact lifecycle | `test_m07_events.py`, `test_assets_events.py` | **DONE** |
+| **M8** | `mechanics/surfaces_curved` (tracks/hill/bowl/table/edge/peg/slot) | `test_m08_curved_surfaces.py` | **DONE** |
+| **M9** | `overlays/{graphs,kinematics,momentum}` (Signal/GraphBinding, velocity field) | `test_m09_overlays.py` | **DONE** |
+| **M10** | `mechanics/springs` (LinearSpring/Damper/TorsionSpring, Hooke/damper laws, series/parallel `SpringGroup`) | `test_m10_springs.py` | **DONE** |
+| **M11** | `mechanics/chain` (DistributedBody: Chain/ElasticString/MassiveSpring/FlexibleRod) | `test_m11_chain.py` | **DONE** |
+| **M12** | `core/impact` + `overlays/events` (PiecewiseTrajectory/EventCounter/collision) | `test_m12_collisions.py` | **DONE** |
 | **M13** | `mechanics/orbital` | `test_m13_orbital.py` | scaffold |
 | **M14** | `mechanics/reference_frames` | `test_m14_frames.py` | scaffold |
 | **M15** | `recipes/base` | `test_m15_recipes.py` | scaffold |
@@ -49,7 +50,7 @@ Out of scope here: fluids **F1–F6** (sibling domain) — scaffold separately.
 
 ```bash
 # Whole suite — stays green (structural passes + xfail specs):
-uv run pytest -q                         # -> 50 passed, 38 xfailed
+uv run pytest -q                         # -> 245 passed, 5 xfailed
 uv run ruff check .                      # scaffold is lint-clean
 
 # One milestone's specs, forced to run for real (the TDD "red"):

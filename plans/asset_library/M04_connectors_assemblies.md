@@ -93,6 +93,66 @@ class PinJoint(Connector):        # semantic "A pinned to B at point": reaction 
     # declares equal/opposite REACTION on both bodies (Newton's 3rd) when asked
 ```
 
+## Rope wrapping a pulley — the arch + spindle wrap (MUST)
+
+> A rope over a pulley is **not** one straight line to a single rim point. It has
+> **two tangent contact points** where it meets the wheel, a **wrap arc (the
+> "arch") that rides on the rim between them**, and **two straight free
+> segments** to the external anchors. As the pulley turns **without slipping**,
+> the rim speed equals the rope speed and both free ends pay in/out together.
+
+Geometry (all derived, never hand-placed) — for a pulley (`centre C`, radius `R`)
+and two external anchors `A`, `B`:
+
+```
+# tangent point from an external point P to the circle (right angle at T):
+theta = arccos(R / |P - C|)                      # half-angle of the tangent cone
+T_+/- = C + R * rotate(unit(P - C), +/- theta)   # the two tangent points
+# pick the OUTER one at each anchor (farthest from the other anchor) so the rope
+# hugs the far side and never cuts through the wheel:
+T_A = argmax_{T in tangents(A)} |T - B|
+T_B = argmax_{T in tangents(B)} |T - A|
+wrap_angle = signed angle from (T_A - C) to (T_B - C) on the wrap side
+```
+
+```python
+@dataclass
+class RopeOverPulley(Connector):
+    """A rope that wraps a pulley: two tangents + an arc on the rim + two contacts."""
+    name="rope"; pulley=None            # a Pulley (or centre+radius)
+    from_point=(0,0); to_point=(0,-1)   # the two external anchors A, B
+    tension_label="T"; turns=1.0        # >1 => spindle wrap (rope wound n times)
+    show_tension=True
+    def build():
+        C,R = pulley.centre, pulley.radius
+        T_A = outer_tangent(from_point, C, R, away_from=to_point)
+        T_B = outer_tangent(to_point,   C, R, away_from=from_point)
+        Line(from_point, T_A) + Arc(T_A -> T_B on the wrap side) + Line(T_B, to_point)
+        keypoints: from, to, contact_a=T_A, contact_b=T_B, arc_mid
+    wrap_angle() -> float                # the subtended wrap (rad); *turns for a spindle
+    tension_on(body, at, toward):        # each free end pulls toward its tangent point
+```
+
+### Spindle / capstan wrap (`turns > 1`)
+
+A rope wound several times around a small **spindle/drum** (a winch, a capstan, a
+yo-yo axle) wraps the same tangent-point geometry but with a **wrap arc that
+exceeds 2π** — `turns` full loops plus the partial arc. Render it as a short
+**helical band** (concentric offset arcs, each turn stepped slightly along the
+axle) so `n` turns read as `n` stacked loops; the contact points and free
+segments are unchanged. The capstan relation (`T_load = T_hold · e^{μ·wrap}`) is
+a *declared* constitutive value on the rope (an observable), **not** integrated
+by the asset.
+
+### No-slip coupling (MUST)
+
+`RollingConstraint`/`RopeLengthConstraint` express "the rope does not slip on the
+wheel": one `RollingPoseBinding` spins the pulley so a marked rim point tracks the
+rope, and the free-end lengths change by the same arc length the rim turns
+(`Δs_rope = R · Δθ_pulley`). The wheel rotation and the rope pay-out are one
+supplied kinematic quantity, never two independent animations.
+
+
 ## Assembly enhancements (`assembly.py`)
 
 ```python
@@ -151,6 +211,11 @@ hinge.reaction_on("rod")                  # reaction R at H on the rod's FBD
 - Pulley two-rope assembly: T_A at pulley.A, T_B at pulley.B, angles 30/60.
 - slips=True adds slip-marker submobjects; slips=False does not.
 - Assembly.resolve("pulley.A") returns the same point Pulley registered.
+- RopeOverPulley: contact_a/contact_b lie ON the rim (|T - C| == R) and each
+  tangent segment is perpendicular to its radius (CT . (P - T) == 0); the wrap arc
+  connects the two contacts; wrap_angle in (0, 2*pi).
+- Spindle wrap (turns=n): wrap_angle == base_wrap + 2*pi*(n-1); the render has n
+  stacked loop submobjects.
 ```
 
 ## Render smoke
@@ -160,5 +225,7 @@ down, slip hashes on rope B.
 
 ## Use cases unlocked
 Atwood (M15 recipe), massive/movable pulley variants, rope-over-peg (with M8),
-hinged rod / physical pendulum (with M3 `Rod` + this `Hinge`), and the
-tension/reaction FBD vocabulary reused by springs (M10) and collisions (M12).
+hinged rod / physical pendulum (with M3 `Rod` + this `Hinge`), a **rope pulled at
+an angle over a pulley to lift a mass** (the arch + two contacts + no-slip spin),
+**winch/capstan/yo-yo spindle wraps** (`turns > 1`), and the tension/reaction FBD
+vocabulary reused by springs (M10) and collisions (M12).

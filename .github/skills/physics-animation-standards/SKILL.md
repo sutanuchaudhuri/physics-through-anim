@@ -822,3 +822,40 @@ large, the visuals are too short for the script — slow them down or trim the
 narration, don't just accept the freeze. Discovered rebuilding
 `s02_why_not_backward.py`.
 
+## 19. Build scenes from the physics asset library when asked
+
+**Trigger:** the user asks to "use/reuse the asset library", "build from assets",
+"assemble this from the mechanics assets", or otherwise names catalogue objects
+(block, disk, cylinder, rod, incline, conveyor, pulley, rope, hinge, ...).
+
+Do this (don't hand-draw shapes and arrows):
+
+- **Construct from the catalogue** in
+  `physics_through_anim.physics.mechanics`: bodies (`Block`, `Disk`, `Ring`/`Hoop`,
+  `Sphere2D`, `Cylinder`, `Rod`), supports/walls (`Floor`, `Wall`, `Ceiling`,
+  `Incline`, `Conveyor`, `Corner`, `Pulley`), connectors (`Rope`, `Cable`,
+  `Hinge`, `PinJoint`), and compose with `Assembly`. Supply only the properties
+  the problem states; rely on defaults.
+- **Place with the constraint, not coordinates.** `assembly.add(body,
+  place_on=floor|ramp|[wall_a, wall_b])` seats to tangency (walls are
+  impenetrable); `hang(pulley, from_ceiling=...)` and `connect(rope)` resolve
+  attachment points by name (`"pulley.A" -> "m_1.top"`). Never compute seat/attach
+  geometry by hand.
+- **Get the FBD from the model, never bare `Arrow`s.** Declare forces at named
+  keypoints (`body.add_force(NORMAL, at="contact", ...)`, `rope.tension_on(...)`,
+  `hinge.reaction_on(...)`), then render `assembly.fbd()` — it already obeys Rules
+  2/5/8/9 (colours, perpendicular velocities, layout, symbols).
+- **A body's picture is a cosmetic skin over a point/rigid model.** For a
+  boat/stone/rock etc. pass a `skin` mobject (or `render.Mask`/`render.rock_skin`)
+  — the physics stays the disk/point; the skin is decoration
+  (`plans/asset_library/RENDER_MASK.md`).
+- **Rolling/animation uses the M1.6 bindings**, not ad-hoc
+  `.animate.shift().rotate()`: `motion.roll_group` / `roll_along_surface`,
+  `RollingPoseBinding`, `RigidPoseBinding` (`Δθ = -Δs/R`, always in contact).
+- **Do NOT force the asset library onto lessons that did not ask** — a bespoke
+  hand-built scene stays hand-built unless the user requests the catalogue.
+
+The library is documented per milestone under `plans/asset_library/` and QA'd by
+the `asset_demo` gallery (`s07_asset_gallery.py`).
+
+

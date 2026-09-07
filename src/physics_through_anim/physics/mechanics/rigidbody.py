@@ -30,6 +30,8 @@ class BodyState2D:
     pose: Pose2D = Pose2D()
     velocity: Vec2 = (0.0, 0.0)
     omega: float = 0.0
+    acceleration: Vec2 = (0.0, 0.0)
+    alpha: float = 0.0
 
 
 @dataclass
@@ -42,24 +44,35 @@ class RigidBody2D:
 
     def set_pose(self, pose: Pose2D) -> None:
         """Set the ABSOLUTE pose (rebuild from canonical geometry -- never accumulate)."""
-        raise NotImplementedError("M1.5 RigidBody2D.set_pose")
+        self.pose = pose
 
     def keypoint(self, key: str) -> np.ndarray:
         """World coordinates of a local keypoint under the current pose."""
-        raise NotImplementedError("M1.5 RigidBody2D.keypoint")
+        return self.pose.world_point(self.local_keypoints[key])
+
+    def _cm_world(self, state: BodyState2D | None) -> np.ndarray:
+        pose = state.pose if state is not None else self.pose
+        return pose.world_point(self.local_keypoints.get("CM", (0.0, 0.0)))
 
     def point_position(self, ref: str, state: BodyState2D | None = None) -> np.ndarray:
         """World position of local keypoint ``ref`` (using ``state.pose`` if given)."""
-        raise NotImplementedError("M1.5 RigidBody2D.point_position")
+        pose = state.pose if state is not None else self.pose
+        return pose.world_point(self.local_keypoints[ref])
 
     def point_velocity(self, ref: str, state: BodyState2D) -> np.ndarray:
-        """``v_P = v_G + omega x r_(P/G)`` -- the generic (r_y, -r_x) construction."""
-        raise NotImplementedError("M1.5 RigidBody2D.point_velocity")
+        """``v_P = v_G + omega x r_(P/G)`` -- delegates to ``kinematics.rigid_body``."""
+        from physics_through_anim.physics.kinematics.rigid_body import point_velocity
+
+        return point_velocity(self, ref, state)
 
     def point_acceleration(self, ref: str, state: BodyState2D) -> np.ndarray:
-        """``a_P = a_G + alpha x r + omega x (omega x r)``."""
-        raise NotImplementedError("M1.5 RigidBody2D.point_acceleration")
+        """``a_P = a_G + alpha x r + omega x (omega x r)`` -- delegates to kinematics."""
+        from physics_through_anim.physics.kinematics.rigid_body import point_acceleration
+
+        return point_acceleration(self, ref, state)
 
     def inertia_about(self, ref: str) -> float:
         """Inertia about local keypoint ``ref`` via the CM offset (parallel axis)."""
-        raise NotImplementedError("M1.5 RigidBody2D.inertia_about")
+        local_cm = np.array(self.local_keypoints.get("CM", (0.0, 0.0)))
+        offset = np.array(self.local_keypoints[ref]) - local_cm
+        return self.mass_props.inertia_about((float(offset[0]), float(offset[1])))

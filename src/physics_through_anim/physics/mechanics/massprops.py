@@ -23,4 +23,5 @@ class MassProperties:
 
     def inertia_about(self, r_from_cm: Vec2) -> float:
         """Parallel axis: ``I = I_cm + m * |r_from_cm|^2``."""
-        raise NotImplementedError("M1.5 massprops.inertia_about")
+        r2 = r_from_cm[0] ** 2 + r_from_cm[1] ** 2
+        return self.inertia_cm + self.mass * r2

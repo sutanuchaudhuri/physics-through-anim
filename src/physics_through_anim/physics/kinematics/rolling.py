@@ -20,4 +20,5 @@ class RollingKinematicRelation:
 
     def pose_from_arc(self, s: float) -> Pose2D:
         """Absolute pose after rolling arc length ``s`` (Delta theta = -s/R)."""
-        raise NotImplementedError("M1.6 RollingKinematicRelation.pose_from_arc")
+        angle = -self.direction * s / self.radius
+        return Pose2D(position=(self.direction * s, 0.0), angle=angle)

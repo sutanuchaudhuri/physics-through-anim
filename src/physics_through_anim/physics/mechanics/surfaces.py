@@ -26,25 +26,34 @@ class Surface(Protocol):
 
 @dataclass
 class LineSurface:
-    """A straight segment surface."""
+    """A straight segment surface from ``a`` to ``b`` (parameter ``s`` in [0, 1])."""
 
     a: Vec2 = (0.0, 0.0)
     b: Vec2 = (1.0, 0.0)
 
+    def _dir(self) -> np.ndarray:
+        d = np.array([self.b[0] - self.a[0], self.b[1] - self.a[1], 0.0])
+        n = np.linalg.norm(d)
+        return d / n if n else np.array([1.0, 0.0, 0.0])
+
     def point_at(self, s: float) -> np.ndarray:
-        raise NotImplementedError("M2 LineSurface.point_at")
+        return np.array(
+            [self.a[0] + s * (self.b[0] - self.a[0]), self.a[1] + s * (self.b[1] - self.a[1]), 0.0]
+        )
 
     def tangent_at(self, s: float) -> np.ndarray:
-        raise NotImplementedError("M2 LineSurface.tangent_at")
+        return self._dir()
 
     def normal_at(self, s: float) -> np.ndarray:
-        raise NotImplementedError("M2 LineSurface.normal_at")
+        """Left (outward) unit normal: tangent rotated +90 degrees."""
+        t = self._dir()
+        return np.array([-t[1], t[0], 0.0])
 
     def curvature_at(self, s: float) -> float:
         return 0.0
 
     def length(self) -> float:
-        raise NotImplementedError("M2 LineSurface.length")
+        return float(np.hypot(self.b[0] - self.a[0], self.b[1] - self.a[1]))
 
 
 @dataclass

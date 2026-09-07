@@ -56,4 +56,5 @@ class QuantityRef:
 
 def parse(ref: str) -> PointRef:
     """Parse ``"asset.key"`` into a :class:`PointRef` (round-trips via ``str``)."""
-    raise NotImplementedError("M1.5 refs.parse")
+    asset, _, key = ref.partition(".")
+    return PointRef(asset=asset, key=key)

@@ -116,20 +116,63 @@ Cylinder/Disk.animate_roll(scene, distance, run_time=3, rightward=True):
 > New tiny module `motion.py` holds the framework-level `roll_group` so the
 > asset layer never depends on any lesson's `common.py` (cross-cutting rule 5).
 
+## Rock rolling — a customizable, extensible skin over a rolling disk (render)
+
+A rolling body's **physics is a disk** (radius `R`, contact `P`, `ω = v/R`,
+inertia factor); its **picture can be anything** — a rock, a wheel, a barrel, a
+logo. This reuses the render `Mask` design (`plans/asset_library/RENDER_MASK.md`):
+the skin is decoupled from the physics. The one difference from a point-mass mask
+is that a rolling body's rotation is **physical** (`Δθ = -Δs/R`), so the skin
+rolls *with* the disk rather than merely spinning for looks.
+
+- **The rock is an input.** `CircularBody(skin=<mobject>)` accepts any Manim
+  mobject as its visual; the circle + spoke become optional guides. The skin is
+  fit to the body diameter and rides the rolling pose (so `P`, `CM`, `mg` and the
+  Rule 5 velocity field are unchanged — only what you *see* changes).
+- **Customize** via `render/skins.py`:
+  - `radial_polygon(radii, radius)` — the rock as an **input vector**: one radius
+    per rim vertex (a shape signature). Feed any vector to get any silhouette.
+  - `rock_skin(radius, sides=9, jitter=0.18, seed=0, color, fill_opacity)` — a
+    jagged rock polygon built from a seeded radial profile (reproducible).
+- **Extend** three ways, no framework change:
+  1. pass your own `skin` mobject — an image/SVG, or `Mask.from_matrix(pixels)`;
+  2. supply a custom `radii` vector to `radial_polygon`;
+  3. subclass `CircularBody` (e.g. `Boulder`, `Wheel`) fixing the skin/inertia.
+
+```python
+rock = rock_skin(radius=0.6, sides=9, jitter=0.2, seed=3)     # or Mask.from_matrix(img)
+boulder = Disk(radius=0.6, skin=rock, show_spoke=False, label="m")
+a.add(floor); a.add(boulder, place_on=floor)
+motion.roll_group(scene, boulder, distance=6.0)               # Δθ = -Δs/R, no drift
+# contact P, CM, weight at CM, and the rolling velocity field are the disk physics;
+# the rock is only the skin -- swap it for a wheel/barrel/photo and nothing else moves.
+```
+
+> Layering: `render/skins.py` (a leaf) *produces* the rock mobject; `CircularBody`
+> merely accepts a generic `skin` mobject, so `mechanics` never imports `render`.
+
 ## Cylinder-on-incline (the M3 flagship)
+
+> **Seating and staying-on-the-slope are the *same non-penetration constraint* as
+> M2, not special code.** `place_on=ramp` seats a round body tangent to the slope
+> (`clearance == 0`: centre one radius out along the surface normal). Rolling uses
+> `motion.roll_along_surface`, which parametrises the centre along the surface
+> tangent at that fixed offset — so the body is *always in contact* and can never
+> pierce the ramp. "Being on the surface" is part of the motion, never hand-placed.
 
 ```python
 class M3CylinderOnIncline(Scene):
     a = Assembly()
-    floor = Floor(); ramp = Incline(angle_deg=30, on_floor=True)
-    cyl = Cylinder(radius=0.6, show_cross_section=True, label="m")
-    a.add(floor); a.add(ramp); a.add(cyl, place_on=ramp)     # seats on slope, P moving
-    # FBD at the right keypoints:
-    cyl.add_force(NORMAL,   at="P",  label="N", direction=ramp.normal())
-    cyl.add_force(FRICTION, at="P",  label="f", direction=ramp.slope_up())
+    floor = Floor(); ramp = Incline(angle_deg=28, on_floor=True)
+    cyl = Cylinder(radius=0.5, show_cross_section=True, label="m")
+    a.add(floor); a.add(ramp)
+    a.add(cyl, place_on=ramp)                    # constraint seats it tangent (no coords)
+    # FBD at the contact P:
+    cyl.add_force(NORMAL,   at="contact", label="N", direction=ramp.normal())
+    cyl.add_force(FRICTION, at="contact", label="f", direction=ramp.tangent())  # up-slope
     # weight already auto at CM (down)
     play(FadeIn(a.mobject)); play(FadeIn(a.fbd()))
-    a.animate_roll_down(ramp, distance=3.0)     # Rule 7 rolling down the slope
+    motion.roll_along_surface(scene, cyl, ramp, distance=3.4, down=True)   # stays in contact
     # show rolling velocity field at 3 rim points (Rule 5) at one frozen frame
     for P in (top, three_oclock, nine_oclock): draw perp-to-contact velocity arrow
     finish_with_narration()

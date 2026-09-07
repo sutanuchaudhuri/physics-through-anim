@@ -59,3 +59,6 @@ class ForceKind(StrEnum):
     APPLIED = "applied"  # F
     TENSION = "tension"  # T (rope/string)
     REACTION = "reaction"  # hinge/pin reaction
+    SPRING = "spring"  # F_s (elastic restoring force)
+    DAMPING = "damping"  # F_c (velocity-opposing dashpot force)
+    GRAVITY = "gravity"  # F_g (central gravitation GMm/r^2; mg is the uniform-field label)

@@ -4,6 +4,9 @@ Milestone **M1.5** (Pose2D + local keypoints, RigidBody2D, typed refs, loads).
 Plan: [M01_5_pose_rigidbody.md](M01_5_pose_rigidbody.md) · Jira epic **PAC-1** /
 story **PAC-2**.
 
+> **STATUS: IMPLEMENTED (2026-09-06)** — all M1.5 specs pass (18/18); the `xfail`
+> markers have been removed. The section below documents the original TDD plan.
+
 This milestone is built **test-first**. The acceptance criteria below are already
 encoded as executable tests in
 [`tests/test_m1_5_pose_rigidbody.py`](../../tests/test_m1_5_pose_rigidbody.py).

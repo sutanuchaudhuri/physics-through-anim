@@ -130,6 +130,111 @@ Assembly.animate_trajectory(...) already moves bodies; a spring bound with
 so the coil visibly stretches/compresses as the mass moves — no bespoke updater.
 ```
 
+## Endpoints, orientation & attachment (both ends are connectors)
+
+Every spring/damper is a two-ended **connector**: its `A` and `B` keypoints are
+*contact points* that either pin to a fixed anchor or ride a moving body. The
+drawn coil never fixes an orientation — the axis is always derived from the two
+live endpoint positions, so **horizontal, vertical, inclined, or arbitrary** all
+fall out of where the ends are attached.
+
+```python
+# An endpoint is one of three attachment kinds (resolved at `a.connect(spring)`):
+SpringEndpoint = FixedAnchor(point)              # bolted to wall/floor/ceiling
+               | BodyPoint(AssetRef, keypoint)   # a Block/body keypoint (e.g. "m.left")
+               | MassPoint(AssetRef)             # a Particle's CM (point mass)
+
+@dataclass
+class LinearSpring(Connector):
+    from_ref: str = ""          # "wall.surface" | "floor.mount" | "m.left" | "P.CM"
+    to_ref:   str = ""
+    # orientation is NOT a field — direction = unit(B - A) from the two endpoints
+    def axis(self):    return unit(self.keypoint("B") - self.keypoint("A"))
+    def orientation(self): return atan2(*reversed(axis()))  # 0=horizontal, pi/2=vertical
+```
+
+- **Fixed to floor/wall/ceiling** — `from_ref="floor.mount"` (a vertical spring
+  standing on the ground) or `from_ref="wall.surface"` (a horizontal spring off a
+  wall). The fixed end draws a small **anchor glyph** (hatched pad) so the
+  contact reads as grounded, not free.
+- **Connected to a block** — `to_ref="m.left"` / `"m.top"` / `"m.right"`; the end
+  follows that body keypoint via `PointAttachmentBinding` (M1.6). A **vertical**
+  hanging spring is just `from_ref="ceiling.mount"`, `to_ref="m.top"`.
+- **Connected to a point mass** — `to_ref="P.CM"` where `P` is a `Particle`; the
+  end tracks the point mass. Two point masses joined by one spring (`from_ref=
+  "P1.CM"`, `to_ref="P2.CM"`) is the coupled-oscillator primitive.
+- **Both ends moving** — neither end need be fixed; the coil re-derives its axis
+  and length each frame from both bindings.
+
+## Series & parallel combinations
+
+**Status: implemented** — `SpringGroup` + `series_springs`/`parallel_springs`
+(`tests/test_m10_springs.py`, scene `s16`). The endpoint-attachment `from_ref`/
+`to_ref` resolution and anchor glyphs below remain forward design; scenes wire
+endpoints directly for now (see `s17`).
+
+Combinations are **layout + effective-stiffness** helpers; each still renders as
+real coils with visible end connectors, and the effective `k` is a local
+constitutive fact (not a solve).
+
+```python
+# Series: springs share collinear axis end-to-end; the shared junctions are
+# drawn as small connector dots (contact points), one coil feeding the next.
+def series_springs(springs) -> SpringGroup:
+    k_eff = 1.0 / sum(1.0 / s.k for s in springs)   # 1/k = Σ 1/k_i
+    # A ── coil_1 ──•── coil_2 ──•── coil_3 ── B   (• = junction connector)
+
+# Parallel: springs share the SAME two endpoints, stacked (offset perpendicular
+# to the axis) so both coils are visible between the one pair of contact points.
+def parallel_springs(springs) -> SpringGroup:
+    k_eff = sum(s.k for s in springs)               # k = Σ k_i
+    # A ═╦═ coil_top ═╦═ B
+    #    ╚═ coil_bot ═╝        (both pinned to the same A and B)
+
+@dataclass
+class SpringGroup(Connector):
+    members: list[LinearSpring]
+    arrangement: str = "series"   # "series" | "parallel"
+    k_eff: float                  # computed as above
+    def build():  # lay out members, draw junction/□ end connectors, keypoints A,B
+    def deformation(): ...        # overall stretch of the group between A and B
+```
+
+- **Orientation is inherited** from the group's `A→B` axis, so a series or
+  parallel bank can be horizontal, vertical, or on an incline exactly like a
+  single spring.
+- **End connectors are explicit**: the two outer ends (`A`, `B`) and every series
+  junction render a small connector marker, so a viewer can see where the bank
+  attaches to a mass, another spring, or the floor.
+- Effective-`k` labels (`k_eff`) are available for FBD/graph annotations via M9
+  overlays; combining springs does not integrate anything.
+
+## Mounting a pulley on an incline (two flavours)
+
+**Status: implemented** — `circular.mount_pulley` + `Incline.mount_pulley`
+(`tests/test_pulley_mount.py`, scene `s17`). Used when a rope over a pulley caps
+a machine (spring–block–spring–rope–pulley–mass), the pulley is fixed to the top
+of the incline in one of two ways:
+
+```python
+class PulleyMount(StrEnum):
+    ON_SUPPORT = "on_support"   # flavour 1: axle held off the apex by an immovable bracket
+    AT_POINT   = "at_point"     # flavour 2: axle coincides with the apex point
+
+mounted = incline.mount_pulley(radius=0.34, flavour="on_support", standoff=0.5)
+pulley, bracket, axle = mounted.pulley, mounted.bracket, mounted.axle
+# generic form for any point + outward normal:
+mount_pulley(point, radius, flavour, normal, standoff) -> MountedPulley
+```
+
+- **Flavour 1 (`ON_SUPPORT`)** — the axle sits `standoff` along the incline's
+  outward normal above the apex; a drawable `PulleyBracket` (hatched pad at the
+  apex + a post up to the axle) reads as an immovable mount.
+- **Flavour 2 (`AT_POINT`)** — the axle *is* the apex; no bracket is drawn.
+- Either way the mount returns a `FixedAxleConstraint(participants=(pulley,),
+  at="axle")`, so the axle is a pinned point the timeline/FBD can reference. The
+  bracket is a `STATIC` `Support` (no FBD), consistent with walls/tables.
+
 ## Demo — horizontal mass–spring (SHM) with phase portrait
 
 ```python
@@ -166,6 +271,8 @@ natural length; phase-portrait cursor traces an ellipse. Confirm by two frames
 (max compression, max stretch).
 
 ## Use cases unlocked
-Horizontal/vertical mass-spring, coupled oscillators, normal modes, spring on
+Horizontal/vertical/inclined mass-spring, spring fixed to floor/wall/ceiling,
+spring between two point masses, coupled oscillators, normal modes, spring on
 incline, pendulum+spring, damped/driven oscillator (with M9 graph), torsion
-pendulum, effective spring combinations, spring-release collisions (M12).
+pendulum, **series and parallel spring banks** (effective-`k` combinations with
+visible end/junction connectors), spring-release collisions (M12).

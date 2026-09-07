@@ -452,3 +452,158 @@ class_name = "Scene44FinalConceptualMap"
 narration = "s44_final_conceptual_map"
 chapter = "VI"
 
+[lessons.asset_demo]
+dir = "asset_demo"
+audio_subdir = "asset_demo"
+final_output = "asset_demo_full.mp4"
+
+[lessons.asset_demo.scenes."01"]
+file = "s01_cumulative_assets.py"
+class_name = "CumulativeAssets"
+narration = "s01_cumulative_assets"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."02"]
+file = "s02_kinematics_bindings.py"
+class_name = "KinematicsBindings"
+narration = "s02_kinematics_bindings"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."03"]
+file = "s03_supports_contact.py"
+class_name = "SupportsAndContact"
+narration = "s03_supports_contact"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."04"]
+file = "s04_rock_rolling.py"
+class_name = "RockRolling"
+narration = "s04_rock_rolling"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."05"]
+file = "s05_cylinder_incline.py"
+class_name = "CylinderOnIncline"
+narration = "s05_cylinder_incline"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."06"]
+file = "s06_pulley_ropes.py"
+class_name = "PulleyTwoRopes"
+narration = "s06_pulley_ropes"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."07"]
+file = "s07_asset_gallery.py"
+class_name = "AssetGallery"
+narration = "s07_asset_gallery"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."08"]
+file = "s08_projectile_formula.py"
+class_name = "ProjectileFormula"
+narration = "s08_projectile_formula"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."09"]
+file = "s09_projectile_incline.py"
+class_name = "ProjectileOnIncline"
+narration = "s09_projectile_incline"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."10"]
+file = "s10_rope_lifts_mass.py"
+class_name = "RopeLiftsMass"
+narration = "s10_rope_lifts_mass"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."11"]
+file = "s11_slack_string.py"
+class_name = "SlackStringDemo"
+narration = "s11_slack_string"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."12"]
+file = "s12_contact_switch.py"
+class_name = "ContactSwitch"
+narration = "s12_contact_switch"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."13"]
+file = "s13_table_edge.py"
+class_name = "TableEdge"
+narration = "s13_table_edge"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."14"]
+file = "s14_overlays.py"
+class_name = "RollingFieldGraph"
+narration = "s14_overlays"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."15"]
+file = "s15_mass_spring.py"
+class_name = "MassSpringSHM"
+narration = "s15_mass_spring"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."16"]
+file = "s16_spring_banks.py"
+class_name = "SpringBanks"
+narration = "s16_spring_banks"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."17"]
+file = "s17_incline_machine.py"
+class_name = "InclineSpringPulleyMachine"
+narration = "s17_incline_machine"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."18"]
+file = "s18_chain_over_edge.py"
+class_name = "ChainOverEdge"
+narration = "s18_chain_over_edge"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."19"]
+file = "s19_chain_mask.py"
+class_name = "ChainGarmentMask"
+narration = "s19_chain_mask"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."20"]
+file = "s20_galperin.py"
+class_name = "GalperinCounter"
+narration = "s20_galperin"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."21"]
+file = "s21_ball_rebound.py"
+class_name = "BallReboundIncline"
+narration = "s21_ball_rebound"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."22"]
+file = "s22_rod_impulse.py"
+class_name = "RodImpulse"
+narration = "s22_rod_impulse"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."23"]
+file = "s23_sand_on_belt.py"
+class_name = "SandOnBelt"
+narration = "s23_sand_on_belt"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."24"]
+file = "s24_rocket_thrust.py"
+class_name = "RocketThrust"
+narration = "s24_rocket_thrust"
+chapter = "demo"
+
+[lessons.asset_demo.scenes."25"]
+file = "s25_kepler_orbit.py"
+class_name = "KeplerOrbit"
+narration = "s25_kepler_orbit"
+chapter = "demo"
+

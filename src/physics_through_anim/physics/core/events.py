@@ -54,9 +54,10 @@ class Event:
 
 @dataclass
 class EventSequence:
-    """An ordered list of events with cursor + query helpers."""
+    """An ordered list of events with a cursor + query helpers."""
 
     events: list = field(default_factory=list)
+    _cursor: int = 0
 
     def add(self, event: Event) -> None:
         self.events.append(event)
@@ -66,12 +67,42 @@ class EventSequence:
         return len(self.events)
 
     def sort_by_time(self) -> None:
-        raise NotImplementedError("M7 EventSequence.sort_by_time")
+        self.events.sort(key=lambda e: e.time)
 
     def at_or_before(self, t: float) -> Event | None:
-        raise NotImplementedError("M7 EventSequence.at_or_before")
+        """The last event with ``time <= t`` (``None`` before the first event)."""
+        result = None
+        for event in sorted(self.events, key=lambda e: e.time):
+            if event.time <= t:
+                result = event
+            else:
+                break
+        return result
+
+    @property
+    def current(self) -> Event | None:
+        return self.events[self._cursor] if 0 <= self._cursor < len(self.events) else None
+
+    @property
+    def next(self) -> Event | None:
+        nxt = self._cursor + 1
+        return self.events[nxt] if 0 <= nxt < len(self.events) else None
+
+    def advance(self) -> Event | None:
+        """Step the cursor to the next event and return it."""
+        if self._cursor + 1 < len(self.events):
+            self._cursor += 1
+        return self.current
 
 
-def phase_of(seq: EventSequence, t: float) -> Phase:
-    """BEFORE the first event, DURING one, else AFTER."""
-    raise NotImplementedError("M7 phase_of")
+def phase_of(seq: EventSequence, t: float, *, during_eps: float = 1e-6) -> Phase:
+    """BEFORE the first event, DURING one (within ``during_eps``), else AFTER."""
+    if not seq.events:
+        return Phase.BEFORE
+    times = sorted(e.time for e in seq.events)
+    if t < times[0] - during_eps:
+        return Phase.BEFORE
+    if any(abs(t - ti) <= during_eps for ti in times):
+        return Phase.DURING
+    return Phase.AFTER
+

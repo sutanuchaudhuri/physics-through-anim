@@ -11,44 +11,207 @@ from __future__ import annotations
 import numpy as np
 from manim import VGroup
 
+from physics_through_anim.physics.core.events import EventSequence
 from physics_through_anim.physics.mechanics.base import PhysicsAsset
-from physics_through_anim.physics.mechanics.supports import Floor
+from physics_through_anim.physics.mechanics.contact import Contact
+from physics_through_anim.physics.mechanics.geometry import (
+    TOUCH_TOL,
+    body_shape,
+    clearance,
+    corner_seat,
+    seat_circle_on_surface,
+)
+from physics_through_anim.physics.mechanics.supports import Floor, Wall
 
 
 class Assembly:
     """A named collection of placed assets."""
 
-    def __init__(self) -> None:
+    def __init__(self, *, contact_tol: float = TOUCH_TOL) -> None:
         self.members: list[PhysicsAsset] = []
         self.mobject = VGroup()
         self.keypoints: dict[str, np.ndarray] = {}
+        # bodies within this band of a wall are touching, not piercing:
+        self.contact_tol = contact_tol
+        self.contacts: list[Contact] = []
+        self.constraints_by_name: dict[str, object] = {}
+        self.timeline = EventSequence()
 
     def add(self, asset: PhysicsAsset, place_on: PhysicsAsset | None = None) -> PhysicsAsset:
-        """Add an asset, optionally resting it on ``place_on`` (a Floor for now)."""
+        """Add an asset, optionally resting it on ``place_on`` (a Floor or two walls)."""
         if place_on is not None:
             self._place_on(asset, place_on)
         self.members.append(asset)
         self.mobject.add(asset.mobject)
         for key, point in asset.keypoints.items():
             self.keypoints[f"{asset.name}.{key}"] = point
+        self._assert_no_penetration()
         return asset
 
-    def _place_on(self, body: PhysicsAsset, support: PhysicsAsset) -> None:
-        """Shift ``body`` so its bottom rests on ``support``'s surface."""
-        if not isinstance(support, Floor):
-            raise NotImplementedError("Milestone 1 only supports placement on a Floor.")
+    def _place_on(self, body: PhysicsAsset, support) -> None:
+        """Seat ``body`` on a support surface (a Floor, an inclined/vertical wall,
+        or two walls for a corner). Seating is the tangency (non-penetration)
+        constraint at equality -- the body rests exactly on the surface."""
+        if isinstance(support, (list, tuple)):
+            self._seat_in_corner(body, support)
+            return
+        if isinstance(support, Floor):
+            self._seat_on_floor(body, support)
+            return
+        if isinstance(support, Wall):
+            self._seat_on_wall(body, support)
+            return
+        raise NotImplementedError(f"cannot place a body on '{type(support).__name__}'.")
+
+    def _seat_on_floor(self, body: PhysicsAsset, support: Floor) -> None:
         if "bottom" not in body.keypoints:
             raise KeyError(f"'{body.name}' has no 'bottom' keypoint to rest on the floor.")
         gap = support.y - body.keypoint("bottom")[1]
         body.shift([0.0, gap])
-        # Register the resting contact point on the body for FBD anchoring.
         contact_x = body.keypoint("CM")[0]
         body.set_keypoint("contact", support.contact_under(contact_x))
+
+    def _seat_on_wall(self, body: PhysicsAsset, wall: Wall) -> None:
+        """Seat a body tangent to any wall (incline/ramp/vertical) -- the same
+        no-pierce/always-in-contact constraint used for floors and corners."""
+        cm = body.keypoint("CM")
+        if hasattr(body, "radius"):
+            seat, contact = seat_circle_on_surface(float(body.radius), wall, (cm[0], cm[1]))
+            delta = seat - cm
+            body.shift([float(delta[0]), float(delta[1])])
+            body.set_keypoint("contact", contact)
+            return
+        # Polygon body (a block): rotate its base parallel to the surface, then seat
+        # flush so its lowest corner touches -- min clearance driven to 0.
+        if "bottom" not in body.keypoints:
+            raise NotImplementedError(f"cannot seat '{body.name}' on '{wall.name}'.")
+        tangent = wall.tangent()
+        body.rotate(float(np.arctan2(tangent[1], tangent[0])))
+        normal = np.asarray(wall.normal(), dtype=float)
+        gap = clearance(body_shape(body), wall)  # min corner distance (flush => 0)
+        body.shift([float(-gap * normal[0]), float(-gap * normal[1])])
+        body.set_keypoint("contact", body.keypoint("bottom"))
+
+    def _seat_in_corner(self, body: PhysicsAsset, walls) -> None:
+        """Seat a round ``body`` tangent to two walls (the wedge/corner case)."""
+        if len(walls) != 2:
+            raise ValueError("corner placement needs exactly two walls.")
+        if not hasattr(body, "radius"):
+            raise NotImplementedError("corner seating is defined for round bodies (needs .radius).")
+        seat = corner_seat(float(body.radius), walls[0], walls[1])
+        delta = seat - body.keypoint("CM")
+        body.shift([float(delta[0]), float(delta[1])])
+        for i, wall in enumerate(walls):
+            body.set_keypoint(f"contact_{i}", seat - float(body.radius) * wall.normal())
+
+    def _assert_no_penetration(self) -> None:
+        """No dynamic body may cross to a wall's solid side, beyond the contact band."""
+        walls = [m for m in self.members if isinstance(m, Wall)]
+        for body in self.members:
+            if isinstance(body, Wall) or "CM" not in getattr(body, "keypoints", {}):
+                continue
+            shape = body_shape(body)
+            for wall in walls:
+                gap = clearance(shape, wall)
+                if gap < -self.contact_tol:  # within the band == touching (contact), not piercing
+                    raise ValueError(
+                        f"'{body.name}' penetrates '{wall.name}' (clearance {gap:+.4f}); "
+                        "walls are impenetrable."
+                    )
 
     def keypoint(self, key: str) -> np.ndarray:
         if key not in self.keypoints:
             raise KeyError(f"Unknown keypoint '{key}'. Known: {list(self.keypoints)}")
         return self.keypoints[key]
+
+    def resolve(self, ref: str) -> np.ndarray:
+        """Resolve a namespaced keypoint ref (e.g. ``'pulley.A'``) to a world point."""
+        return self.keypoint(ref)
+
+    def body(self, name: str) -> PhysicsAsset:
+        """The member asset named ``name`` (semantic query)."""
+        for member in self.members:
+            if member.name == name:
+                return member
+        raise KeyError(f"No asset named '{name}'. Known: {[m.name for m in self.members]}")
+
+    def assets(self, kind: type | None = None) -> list:
+        """Members, optionally filtered to a class (e.g. ``assets(CircularBody)``)."""
+        return [m for m in self.members if kind is None or isinstance(m, kind)]
+
+    def forces_on(self, name: str) -> list:
+        """The declared ``ForceSpec``s on the named asset."""
+        return list(self.body(name).forces)
+
+    # --- relations + event timeline (M7) ---------------------------------
+
+    def add_relation(self, relation, *, name: str | None = None):
+        """Store a ``Contact`` or a typed constraint (relations, not drawables)."""
+        if isinstance(relation, Contact):
+            self.contacts.append(relation)
+        else:
+            key = name or f"constraint_{len(self.constraints_by_name)}"
+            self.constraints_by_name[key] = relation
+        return relation
+
+    @property
+    def constraints(self) -> list:
+        """The typed constraints, in insertion order."""
+        return list(self.constraints_by_name.values())
+
+    def at(self, t: float) -> None:
+        """Apply the constraint set valid at time ``t`` (toggle per timeline events)."""
+        for constraint in self.constraints_by_name.values():
+            if hasattr(constraint, "active"):
+                constraint.active = True
+        for event in sorted(self.timeline.events, key=lambda e: e.time):
+            if event.time > t:
+                break
+            if event.changes is None:
+                continue
+            for key in event.changes.deactivate:
+                if key in self.constraints_by_name:
+                    self.constraints_by_name[key].active = False
+            for key in event.changes.activate:
+                if key in self.constraints_by_name:
+                    self.constraints_by_name[key].active = True
+
+    def apply_states(self, mapping) -> None:
+        """Apply a ``{name: kinematic state}`` mapping to member bodies (absolute)."""
+        for name, state in mapping.items():
+            self.body(name).apply_state(state)
+
+    def animate_trajectory(self, scene, trajectory, t0: float, t1: float,
+                           *, run_time: float = 5.0) -> None:
+        """Drive member bodies from a ``Trajectory``: each frame samples
+        ``state_at(t).entities`` and applies it (M1.6 absolute pose, no drift)."""
+        from manim import ValueTracker
+
+        scene.add(self.mobject)  # ensure the group is in the scene so its updater fires
+        tracker = ValueTracker(t0)
+
+        def update(_):
+            entities = trajectory.state_at(tracker.get_value()).entities
+            for name, state in entities.items():
+                self.body(name).apply_state(state)
+
+        self.mobject.add_updater(update)
+        scene.play(tracker.animate.set_value(t1), run_time=run_time)
+        self.mobject.clear_updaters()
+
+    def connect(self, connector) -> PhysicsAsset:
+        """Resolve a connector's ``from_ref``/``to_ref`` to world points and add it."""
+        a = self.resolve(connector.from_ref)
+        b = self.resolve(connector.to_ref)
+        connector.set_endpoints(a, b)
+        return self.add(connector)
+
+    def hang(self, pulley, from_ceiling, *, drop: float = 0.8) -> PhysicsAsset:
+        """Placement sugar: seat a pulley's axle ``drop`` below a ceiling anchor."""
+        anchor = from_ceiling.anchor(pulley.keypoint("axle")[0])
+        target = anchor - np.array([0.0, drop, 0.0])
+        pulley.shift(target - pulley.keypoint("axle"))
+        return self.add(pulley)
 
     def fbd(self, include=None) -> VGroup:
         """Union of every member's free-body diagram."""
