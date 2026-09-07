@@ -1,6 +1,6 @@
 ---
 name: physics-animation-standards
-description: 'Production standards for Manim physics animation scenes in this repo (src/physics_through_anim/lessons/**). Use when creating or editing a Manim scene, adding force/kinematic vectors, deriving a formula, laying out multiple equations, animating rolling/rotation, simulating rigid-body/pendulum motion with manim-physics, reviewing a specific scene for standards compliance, scaffolding a brand-new lesson from a plan document, stitching a lesson''s rendered scenes into one final video from the command line, adding/using per-scene event-transcript logging to debug "what happened when", composing a scene from smaller sub-scenes played sequentially (fade in/out) or all at once, creating a 3D scene or transforming a 2D shape into 3D with manim''s ThreeDScene camera, or updating this skill by learning from an external file/folder of example Manim animation code. Covers reference-frame icons, FBD-vs-kinematics vector colors, assumption-checked derivations, quadrant layout for multi-formula scenes, exact perpendicular velocity vectors, mandatory real rolling animation, the manim-physics plugin (SpaceScene/Pendulum/Wave), the overlap-avoidance layout contract, the lessons.toml/LessonRegistry scaffold workflow, the per-scene review checklist, the render/stitch/Makefile command-line workflow, the SceneEventLogMixin transcript-logging utility, the sub-scene composition helper (sequential/together), the ThreeDLessonScene 3D base class with the 2D-to-3D lift_to_3d transform, the finish_with_narration audio/video sync rule, and the self-updating learn-from-example workflow.'
+description: 'Production standards for Manim physics animation scenes in this repo (src/physics_through_anim/lessons/**). Use when creating or editing a Manim scene, adding force/kinematic vectors, deriving a formula, laying out multiple equations, animating rolling/rotation, simulating rigid-body/pendulum motion with manim-physics, reviewing a specific scene for standards compliance, scaffolding a brand-new lesson from a plan document, stitching a lesson''s rendered scenes into one final video from the command line, adding/using per-scene event-transcript logging to debug "what happened when", composing a scene from smaller sub-scenes played sequentially (fade in/out) or all at once, creating a 3D scene or transforming a 2D shape into 3D with manim''s ThreeDScene camera, or updating this skill by learning from an external file/folder of example Manim animation code. Covers reference-frame icons, FBD-vs-kinematics vector colors, assumption-checked derivations, quadrant layout for multi-formula scenes, exact perpendicular velocity vectors, mandatory real rolling animation, the manim-physics plugin (SpaceScene/Pendulum/Wave), the overlap-avoidance layout contract, the lessons.toml/LessonRegistry scaffold workflow, the per-scene review checklist, the render/stitch/Makefile command-line workflow, the SceneEventLogMixin transcript-logging utility, the sub-scene composition helper (sequential/together), the ThreeDLessonScene 3D base class with the 2D-to-3D lift_to_3d transform, the finish_with_narration audio/video sync rule, and the self-updating learn-from-example workflow. For scenes authored as data (a JSON/XML ProblemScenePlan rendered by the svg/manim engines) or for adding cosmetic masks/validator/CLI changes, defer to the separate spec-driven-scenes skill, which interlinks back to these standards for vector colours, cosmetic skins, and place-with-the-constraint seating.'
 ---
 
 # Physics Animation Production Standards (Manim)
@@ -857,5 +857,30 @@ Do this (don't hand-draw shapes and arrows):
 
 The library is documented per milestone under `plans/asset_library/` and QA'd by
 the `asset_demo` gallery (`s07_asset_gallery.py`).
+
+## 20. Data-authored scenes go through the spec-driven skill
+
+**Trigger:** the user wants a scene authored as **data** (a JSON/XML
+`ProblemScenePlan` under `examples/plans/**`), rendered by the `svg`/`manim`
+engines, or asks to add a cosmetic **mask** (helix/spring, chain, hopper, belt,
+sand, plume, …), a validator/CLI/make change, or a `render-plan` output.
+
+That workflow is owned by the separate
+[`spec-driven-scenes`](../spec-driven-scenes/SKILL.md) skill. Read it before
+editing a plan or a mask. The two skills interlock — do not contradict them:
+
+- **This skill** = hand-built Manim lesson scenes under
+  `src/physics_through_anim/lessons/**` (narration, camera, derivations, layout).
+- **Spec-driven skill** = the data model + pluggable renderers under
+  `physics/serialization/` and `physics/rendering/`.
+
+Shared contracts live here and are referenced from there: vector **colours**
+(Rule 2 — a `VectorSpec.role` maps to this palette), **cosmetic skins** (Rule 19,
+`RENDER_MASK.md` — a spec `MaskSpec` is the data form of a skin, and a massless
+spring/chain is a mask with no CM), and **place-with-the-constraint** (Rule 19 —
+`place: {on: …}` seats a body and yields a `contact` keypoint for N/f). When a
+change touches both worlds, update both skills so the palette, skin, and seating
+rules stay identical.
+
 
 

@@ -185,6 +185,150 @@ MechanicsRenderer ..> SystemState
 
 ---
 
+## 1b. Spec-driven scene plan (M17)
+
+The data model authored as JSON/XML: a `ProblemScenePlan` is a bundle of typed
+specs that round-trip through the codec, validate, build into an `Assembly`, and
+render via a pluggable engine (SVG or manim).
+
+```mermaid
+classDiagram
+  direction LR
+
+  class ProblemScenePlan {
+    +ProblemRef problem
+    +LabelPlacement label_placement
+    +list~EntitySpec~ entities
+    +list~RelationSpec~ relations
+    +list~VectorSpec~ vectors
+    +list~MarkerSpec~ markers
+    +list~PathSpec~ paths
+    +list~MaskSpec~ masks
+    +list~StepSpec~ steps
+  }
+  class EntitySpec {
+    +str kind
+    +str name
+    +dict params
+    +StyleSpec style
+    +PlacementSpec place
+    +LabelSpec label
+  }
+  class RelationSpec {
+    +str kind
+    +list participants
+    +dict params
+  }
+  class VectorSpec {
+    +str anchor
+    +tuple vector
+    +str role
+    +bool show_label
+    +LabelPlacement placement
+  }
+  class MarkerSpec {
+    +str at
+    +tuple point
+    +str label
+    +LabelPlacement placement
+  }
+  class PathSpec {
+    +list points
+    +str kind
+    +float height
+  }
+  class MaskSpec {
+    +str kind
+    +tuple point
+    +list points
+    +int coils
+    +float opacity
+  }
+  class StepSpec {
+    +StepKind kind
+    +float at
+    +float dt
+    +list~TransformSpec~ transforms
+  }
+  class TransformSpec {
+    +str target
+    +tuple translate
+    +float rotate_deg
+    +str about
+  }
+  class StyleSpec
+  class PlacementSpec
+  class LabelSpec
+
+  ProblemScenePlan "1" *-- "0..*" EntitySpec
+  ProblemScenePlan "1" *-- "0..*" RelationSpec
+  ProblemScenePlan "1" *-- "0..*" VectorSpec
+  ProblemScenePlan "1" *-- "0..*" MarkerSpec
+  ProblemScenePlan "1" *-- "0..*" PathSpec
+  ProblemScenePlan "1" *-- "0..*" MaskSpec
+  ProblemScenePlan "1" *-- "0..*" StepSpec
+  EntitySpec "1" o-- "1" StyleSpec
+  EntitySpec "1" o-- "1" PlacementSpec
+  EntitySpec "1" o-- "1" LabelSpec
+  StepSpec "1" *-- "0..*" TransformSpec
+
+  ProblemScenePlan ..> Assembly : plan_to_assembly
+  ProblemScenePlan ..> Recipe : plan_to_recipe
+```
+
+<details><summary>PlantUML equivalent</summary>
+
+```plantuml
+@startuml
+skinparam classAttributeIconSize 0
+class ProblemScenePlan {
+  +entities : EntitySpec[]
+  +relations : RelationSpec[]
+  +vectors : VectorSpec[]
+  +markers : MarkerSpec[]
+  +paths : PathSpec[]
+  +masks : MaskSpec[]
+  +steps : StepSpec[]
+}
+class EntitySpec {
+  +kind : str
+  +params : dict
+  +style : StyleSpec
+  +place : PlacementSpec
+  +label : LabelSpec
+}
+class StepSpec {
+  +kind : StepKind
+  +at : float
+  +transforms : TransformSpec[]
+}
+class RelationSpec
+class VectorSpec
+class MarkerSpec
+class PathSpec
+class MaskSpec
+class TransformSpec
+
+ProblemScenePlan "1" *-- "0..*" EntitySpec
+ProblemScenePlan "1" *-- "0..*" RelationSpec
+ProblemScenePlan "1" *-- "0..*" VectorSpec
+ProblemScenePlan "1" *-- "0..*" MarkerSpec
+ProblemScenePlan "1" *-- "0..*" PathSpec
+ProblemScenePlan "1" *-- "0..*" MaskSpec
+ProblemScenePlan "1" *-- "0..*" StepSpec
+StepSpec "1" *-- "0..*" TransformSpec
+EntitySpec ..> StyleSpec
+EntitySpec ..> PlacementSpec
+EntitySpec ..> LabelSpec
+ProblemScenePlan ..> Assembly : plan_to_assembly
+ProblemScenePlan ..> Recipe : plan_to_recipe
+@enduml
+```
+
+</details>
+
+---
+
 ## 2. Flow diagrams
 
 ### 2a. Build & render pipeline
@@ -313,6 +457,55 @@ end fork
 :Manim Scene;
 :stitch -> final video;
 stop
+@enduml
+```
+
+</details>
+
+### 2c. Spec-driven render path (M17)
+
+Authoring a scene as data: a JSON/XML plan is decoded, validated, built into an
+`Assembly`, and drawn by a named engine — SVG (dependency-free) or manim (still
+PNG, or MP4 when `steps` animate). Both engines draw the cosmetic mask library.
+
+```mermaid
+flowchart LR
+  FILE["plan.json / plan.xml"] -->|load_plan / codec| PLAN["ProblemScenePlan<br/>entities · relations · vectors ·<br/>markers · paths · masks · steps"]
+  PLAN -->|validate_plan| VAL{"errors?"}
+  VAL -->|yes| ERR["list PlanError<br/>(render refused)"]
+  VAL -->|no| ASM["plan_to_assembly<br/>seat · wire · relate"]
+  ASM --> SNAP["snapshot_assembly"]
+  SNAP --> ENG{"renderer"}
+  ENG -->|svg| SVG["SVG snapshot<br/>masks · ghosts · styling"]
+  ENG -->|manim still| PNG["styled PNG"]
+  ENG -->|manim + steps| MP4[("MP4 animation")]
+  MASKS["MASK_BUILDERS /<br/>MANIM_MASK_BUILDERS"] -.->|draw_mask| ENG
+  STEPS["steps → ghosts / motions"] -.-> ENG
+```
+
+<details><summary>PlantUML activity (spec-driven render path)</summary>
+
+```plantuml
+@startuml
+start
+:plan.json / plan.xml;
+:load_plan / codec -> ProblemScenePlan;
+:validate_plan;
+if (errors?) then (yes)
+  :list PlanError (render refused);
+  stop
+else (no)
+  :plan_to_assembly (seat / wire / relate);
+  :snapshot_assembly;
+  fork
+    :svg -> SVG snapshot (masks / ghosts / styling);
+  fork again
+    :manim still -> styled PNG;
+  fork again
+    :manim + steps -> MP4 animation;
+  end fork
+  stop
+endif
 @enduml
 ```
 

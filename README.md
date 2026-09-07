@@ -55,21 +55,47 @@ Run `make help` for a self-documenting list. Common variables: `QUALITY`
 | `make list-compilations` | List defined compilations |
 | `make render-plan PLAN=<file>` | Render a scene from a JSON/XML plan (`RENDERER=svg` default) |
 | `make validate-plan PLAN=<file>` | Validate a plan and list every key/value error |
+| `make render-gallery DIR=<folder>` | Batch-render every plan in a folder (`RENDERER=svg`, `OUTPUT_DIR=`) |
+| `make new-plan OUT=<file>` | Scaffold a starter plan with a mask (`MASK=plume`, `KIND=disk`) |
+| `make list-renderers` | List the available render engines (svg, manim, …) |
+| `make list-masks` | List the registered cosmetic mask kinds (the mask library) |
+| `make list-assets` | List the registered entity/asset kinds a plan can build |
 | `make publish-prepare SOURCE= TITLE= DESCRIPTION=` | Persist a pending publish record |
 | `make publish-complete SLUG= VIDEO_ID= URL=` | Record a completed upload |
 | `make list-publications` | List publish records and status |
 | `make test` | Run the test suite |
+| `make test-file FILE=<path>` | Run one test file or node id |
+| `make lint` | Lint with ruff (no tests) |
 | `make check` | Lint (ruff) and run tests |
 | `make clean` | Remove rendered media, caches, and draft audio |
 
 ## Spec-driven scenes (JSON/XML)
 
 Scenes can be authored as configuration and rendered through a pluggable engine —
-no Python required. A `ProblemScenePlan` (entities, relations, and timeline
-`steps`) round-trips losslessly through JSON and XML, builds into a live
-`Assembly`, and renders via a named engine. See
+no Python required. A `ProblemScenePlan` round-trips losslessly through JSON and
+XML, builds into a live `Assembly`, and renders via a named engine. See
 [docs/spec_driven_serialization.md](docs/spec_driven_serialization.md) for the
 full guide.
+
+A plan is a bundle of small, typed specs:
+
+| Spec (field on the plan) | What it authors |
+| --- | --- |
+| `entities` (`EntitySpec`) | The bodies/supports/connectors — any registered kind (`make list-assets`), with `params`, a `style`, relative `place`, and a `label` |
+| `relations` (`RelationSpec`) | Physical links: `rolling`, `hang`, `rope`, `pin`, `axle`, `distance`, `touch`, … |
+| `vectors` (`VectorSpec`) | Force/velocity/etc. arrows anchored to `asset.keypoint`, with role colour, `show_label`, and `placement` |
+| `markers` (`MarkerSpec`) | Highlighted points (contact, CM, pivots) — a dot + optional label with `placement` |
+| `paths` (`PathSpec`) | Traced curves: `polyline` or a generated `parabola` arch (e.g. a projectile trajectory) |
+| `masks` (`MaskSpec`) | Cosmetic, physics-free overlays (`make list-masks`): `plume`/`flame`, `rocket`, `ellipse`, `box`, `chain`, `spring`/`helix`, `hopper`, `belt`, `sand` — transparent, drawn on the bottom layer |
+| `steps` (`StepSpec` + `TransformSpec`) | A timeline of `translate`/`rotate` transforms; rendered as time-stepped **ghost** strobes in SVG and as animation (MP4) in manim |
+| `style` (`StyleSpec`) | Per-entity `display` (solid/fade/dotted/dashed), `fill` (solid/hashed/none), opacity, corner/end dots |
+| `label` / `label_placement` (`LabelSpec`, `LabelPlacement`) | Per-node label text/visibility/placement, plus a plan-wide default placement |
+| `place` (`PlacementSpec`) | Relative placement (`on` a support, or snap `my` keypoint to another `at` + `offset`) — prefer this over absolute coordinates |
+
+Springs and chains are **massless masks** anchored to two key points whose
+separation may change; a sand hopper/belt scene can be entirely cosmetic masks
+plus one ghosting particle. Every plan is checked by a deterministic validator
+before rendering (`validate-plan`), which lists every key/value error.
 
 ```bash
 # Render the bundled example plan to an SVG snapshot (dependency-free, real):
@@ -79,12 +105,23 @@ python main.py render-plan examples/plans/demo_scene.json --renderer svg --outpu
 
 # Your own plan + engine (relative or absolute path):
 make render-plan PLAN=path/to/scene.xml RENDERER=svg OUTPUT=scene.svg
+
+# Scaffold, inspect, and batch-render:
+make new-plan OUT=my_scene.json MASK=spring KIND=disk   # starter plan with a mask
+make list-masks          # every cosmetic mask kind
+make list-assets         # every entity/asset kind a plan can build
+make list-renderers      # every render engine + its kind
+make render-gallery DIR=examples/plans/asset_demo       # batch-render a folder to SVG
 ```
 
-Engines: `manim` (renders a styled still PNG), `svg` (working snapshot),
-`matplotlib` / `plotly` / `pymunk` (scaffolded; `matplotlib`/`plotly` need the
-`viz` extra: `uv sync --extra viz`). The `PLAN` path is resolved from the repo
-root; the bundled example lives at `examples/plans/demo_scene.json`.
+Engines (`make list-renderers`): `svg` (working, dependency-free snapshot; draws
+masks, ghosts, styling), `manim` (prime engine — a styled still PNG, or an MP4
+when the plan has animated `steps`; draws masks too), and `matplotlib` /
+`plotly` / `pymunk` (scaffolded; `matplotlib`/`plotly` need the `viz` extra:
+`uv sync --extra viz`). The `PLAN` path is resolved from the repo root; the
+bundled example lives at `examples/plans/demo_scene.json`, and a 27-scene JSON
+gallery lives under `examples/plans/asset_demo/`.
+
 
 ## Project layout
 

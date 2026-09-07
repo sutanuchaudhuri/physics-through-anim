@@ -3,8 +3,10 @@ SHELL := /bin/bash
 
 .PHONY: help setup sync health list render render-rolling stitch-rolling render-rod \
         stitch-rod render-lesson stitch-lesson compile stitch-compilation \
-        list-compilations render-plan validate-plan publish-prepare publish-complete list-publications \
-        test check clean
+        list-compilations render-plan validate-plan render-gallery new-plan \
+        list-renderers list-masks list-assets \
+        publish-prepare publish-complete list-publications \
+        test test-file lint check clean
 
 # ---------------------------------------------------------------------------
 # Self-documenting help: every target with a `## description` is listed below.
@@ -71,6 +73,21 @@ render-plan: ## Render a scene from a JSON/XML plan (PLAN= RENDERER=svg OUTPUT=)
 validate-plan: ## Validate a JSON/XML plan and list every key/value error (PLAN=)
 	uv run python main.py validate-plan $(or $(PLAN),examples/plans/demo_scene.json)
 
+render-gallery: ## Batch-render every plan in a folder to SVG (DIR= RENDERER=svg OUTPUT_DIR=)
+	uv run python main.py render-gallery $(or $(DIR),examples/plans/asset_demo) --renderer $(or $(RENDERER),svg) $(if $(OUTPUT_DIR),--output-dir $(OUTPUT_DIR),)
+
+new-plan: ## Scaffold a starter plan with a mask (OUT= MASK=plume KIND=disk)
+	uv run python main.py new-plan $(OUT) --mask $(or $(MASK),plume) --kind $(or $(KIND),disk)
+
+list-renderers: ## List the available render engines (svg, manim, ...)
+	@uv run python main.py list-renderers
+
+list-masks: ## List the registered cosmetic mask kinds (the mask library)
+	@uv run python main.py list-masks
+
+list-assets: ## List the registered entity/asset kinds a plan can build
+	@uv run python main.py list-assets
+
 publish-prepare: ## Persist a pending publish record (SOURCE= TITLE= DESCRIPTION=)
 	uv run python main.py publish-prepare $(SOURCE) --title "$(TITLE)" --description "$(DESCRIPTION)" --tags "$(or $(TAGS),)" --visibility $(or $(VISIBILITY),unlisted) --slug "$(or $(SLUG),)" --quality $(or $(QUALITY),high)
 
@@ -82,6 +99,12 @@ list-publications: ## List all publish records and their status
 
 test: ## Run the test suite
 	uv run pytest -q
+
+test-file: ## Run one test file or node (FILE=tests/test_rendering.py[::test_x])
+	uv run pytest -q $(FILE)
+
+lint: ## Lint with ruff (no tests)
+	uv run ruff check .
 
 check: ## Lint (ruff) and run tests
 	uv run ruff check .

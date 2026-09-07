@@ -98,6 +98,42 @@ def build_parser() -> argparse.ArgumentParser:
     )
     validate_plan_parser.add_argument("plan_file", help="Path to a .json or .xml plan.")
 
+    subparsers.add_parser(
+        "list-renderers", help="List the available render engines (svg, manim, ...)."
+    )
+    subparsers.add_parser(
+        "list-masks", help="List the registered cosmetic mask kinds (the mask library)."
+    )
+    subparsers.add_parser(
+        "list-assets", help="List the registered entity/asset kinds a plan can build."
+    )
+
+    gallery_parser = subparsers.add_parser(
+        "render-gallery",
+        help="Batch-render every JSON/XML plan in a directory via one engine.",
+    )
+    gallery_parser.add_argument(
+        "directory", nargs="?", default="examples/plans/asset_demo",
+        help="Folder of plans (default: examples/plans/asset_demo).",
+    )
+    gallery_parser.add_argument("--renderer", default="svg", help="Render engine (default: svg).")
+    gallery_parser.add_argument(
+        "--output-dir", default=None,
+        help="Where to write outputs (default: <directory>/<renderer>).",
+    )
+
+    new_plan_parser = subparsers.add_parser(
+        "new-plan",
+        help="Scaffold a starter JSON plan with a floor, a body, and one mask.",
+    )
+    new_plan_parser.add_argument("output", help="Path for the new .json plan.")
+    new_plan_parser.add_argument(
+        "--mask", default="plume", help="Mask kind to include (see list-masks). Default: plume."
+    )
+    new_plan_parser.add_argument(
+        "--kind", default="disk", help="Body entity kind (see list-assets). Default: disk."
+    )
+
     compile_parser = subparsers.add_parser(
         "compile",
         help=(
@@ -172,6 +208,66 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _render_gallery(directory: str, renderer: str, output_dir: str | None) -> int:
+    """Render every ``.json``/``.xml`` plan in ``directory`` via one engine."""
+    from physics_through_anim.physics.rendering import render_plan_file
+
+    src = Path(directory)
+    plans = sorted(p for p in src.glob("*") if p.suffix.lower() in (".json", ".xml"))
+    if not plans:
+        print(f"No .json/.xml plans found in '{directory}'.")
+        return 1
+    out = Path(output_dir) if output_dir else src / renderer
+    out.mkdir(parents=True, exist_ok=True)
+    failures = 0
+    for plan in plans:
+        target = out / f"{plan.stem}.svg"
+        try:
+            render_plan_file(plan, renderer=renderer, output=target)
+            print(f"  ok   {plan.name}")
+        except Exception as exc:  # noqa: BLE001 -- report and continue the batch
+            failures += 1
+            print(f"  FAIL {plan.name}: {exc}")
+    print(f"Rendered {len(plans) - failures}/{len(plans)} plans into '{out}'.")
+    return 1 if failures else 0
+
+
+def _scaffold_plan(output: str, mask: str, kind: str) -> int:
+    """Write a minimal, valid starter plan (floor + body + one mask) to ``output``."""
+    from physics_through_anim.physics.problems.scene_plan import (
+        EntitySpec,
+        LabelSpec,
+        MarkerSpec,
+        MaskSpec,
+        ProblemScenePlan,
+    )
+    from physics_through_anim.physics.rendering.masks import MASK_BUILDERS
+    from physics_through_anim.physics.serialization import ASSET_BUILDERS, to_json
+
+    if mask not in MASK_BUILDERS:
+        print(f"Unknown mask '{mask}'. Known: {sorted(MASK_BUILDERS)}")
+        return 1
+    if kind not in ASSET_BUILDERS:
+        print(f"Unknown entity kind '{kind}'. Known: {sorted(ASSET_BUILDERS)}")
+        return 1
+    plan = ProblemScenePlan(
+        entities=[
+            EntitySpec(kind="floor", name="floor", params={"y": -2.0, "half_width": 5.0}),
+            EntitySpec(kind=kind, name="body", params={"position": [0.0, -1.0]},
+                       label=LabelSpec(show=False)),
+        ],
+        masks=[MaskSpec(kind=mask, point=(0.0, -1.0))],
+        markers=[MarkerSpec(point=(0.0, -1.0), label="edit me", color="#ff4444")],
+    )
+    target = Path(output)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(to_json(plan), encoding="utf-8")
+    print(f"Wrote starter plan -> {target}")
+    print(f"  validate: python main.py validate-plan {target}")
+    print(f"  render:   python main.py render-plan {target} --renderer svg")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     if args.command == "list":
@@ -219,6 +315,25 @@ def main(argv: list[str] | None = None) -> int:
         for err in errors:
             print(f"  - {err}")
         return 1
+    if args.command == "list-renderers":
+        from physics_through_anim.physics.rendering import available_renderers, get_renderer
+        for name in available_renderers():
+            print(f"{name:14} kind={get_renderer(name).kind}")
+        return 0
+    if args.command == "list-masks":
+        from physics_through_anim.physics.rendering.masks import MASK_BUILDERS
+        for name in sorted(MASK_BUILDERS):
+            print(name)
+        return 0
+    if args.command == "list-assets":
+        from physics_through_anim.physics.serialization import ASSET_BUILDERS
+        for name in sorted(ASSET_BUILDERS):
+            print(name)
+        return 0
+    if args.command == "render-gallery":
+        return _render_gallery(args.directory, args.renderer, args.output_dir)
+    if args.command == "new-plan":
+        return _scaffold_plan(args.output, args.mask, args.kind)
     if args.command == "compile":
         return compile_video(
             args.name, args.lesson, args.scenes, args.quality, args.narration, args.output
